@@ -5,18 +5,13 @@ import { scroller } from "react-scroll";
 
 const NavLink = styled(Link)`
 
-    color: black;
+    color: white;
 
     padding: 2vh 2vw 2vh 2vw;
     text-decoration: none;
 
     cursor: pointer;
-    &:hover {
-        color: black;
-        }
-    &.active {
-    color: grey;
-    }
+
 `;
 const NavMenu = styled.div`
   justify-content: space-between;
@@ -33,7 +28,7 @@ const NavJump = styled.div`
 
     color: white;
     cursor: pointer;
-    padding: 2vh 2vw 0 2vw;
+    padding: 2vh 2vw 2vh 2vw;
 
 
 `;
@@ -66,18 +61,21 @@ class Navbar extends Component{
                         Sbuilt
                     </NavLink>
                     <section style={{display:'flex'}}>
-                        <NavJump onClick={() => {
+                        <NavLink to='/' onClick={() => {
                             this.state.jumpTo = 'landing'
                             this.scrollToSection()
-                        }}>Home</NavJump>
-                        <NavJump onClick={() => {
+                        }}>Home</NavLink>
+                        <NavLink to='/' onClick={() => {
                             this.state.jumpTo = 'about-us'
                             this.scrollToSection()
-                        }}>About us</NavJump>
-                        <NavJump onClick={() => {
+                        }}>About us</NavLink>
+                        <NavLink to='/' onClick={() => {
                             this.state.jumpTo = 'catalog'
                             this.scrollToSection()
-                        }}>Catalog</NavJump>
+                        }}>Catalog</NavLink>
+                        <NavLink to='/3d'>
+                            3D
+                        </NavLink>
                         
                     </section>
                 </NavMenu>

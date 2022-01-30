@@ -6,7 +6,7 @@ class Home extends Component{
     }
     render(){
         return(
-            <div>
+            <div className="containerElement">
                 <div className='landing' style={{minHeight:'100vh',backgroundColor:'white'}}>
                     Home page
                 </div>

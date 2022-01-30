@@ -3,11 +3,11 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
 import Footer from './components/footer/footer';
 import Navbar from './components/navbar/navbar';
 import Home from './pages/home';
+import ThreeD from './pages/threeD';
 
 class App extends Component{
   constructor(props){
@@ -20,6 +20,7 @@ class App extends Component{
         <Navbar/>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/3d" element={<ThreeD />} />
         </Routes>
         <Footer/>
       </div>
