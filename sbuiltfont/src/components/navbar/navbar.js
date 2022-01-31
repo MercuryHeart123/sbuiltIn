@@ -1,86 +1,42 @@
-import React, {Component} from 'react'
-import { NavLink as Link } from 'react-router-dom';
-import styled from 'styled-components';
-import { scroller } from "react-scroll";
+import React,{ useState }  from 'react'
+import {Button,Nav,Navbarcontainer,Navlogo,Navicon,HambergerIcon,NavMenu,NavItem,NavLink, NavBtn} from './navbar.element'
+import { FaBars, FaTimes,  } from "react-icons/fa"
+import { IconContext } from "react-icons";
+import mainLogo from'../../../src/Logos.png';
 
-const NavLink = styled(Link)`
-
-    color: white;
-
-    padding: 2vh 2vw 2vh 2vw;
-    text-decoration: none;
-
-    cursor: pointer;
-
-`;
-const NavMenu = styled.div`
-  justify-content: space-between;
-  display: flex;
-  background-color: black;
-
-  text-align: center;
-  align-items: center;
-  @media screen and (max-width: 768px) {
-    display: none;
-  }
-`;
-const NavJump = styled.div`
-
-    color: white;
-    cursor: pointer;
-    padding: 2vh 2vw 2vh 2vw;
-
-
-`;
-
-class Navbar extends Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            jumpTo : null
-        }
+const Navbar = () => {
+    const [click, setclick] = useState(false)
+    const clickedHandler = () => {
+        setclick(!click)
     }
-    scrollToSection = () => {
-        // console.log(section);
-        if(this.state.jumpTo){
-            scroller.scrollTo(this.state.jumpTo, {
-                duration: 300,
-                delay: 0,
-                smooth: "easeInOutQuart",
-              });
-        }
-        
-      };
-    
-    render(){
-        return(
-            <div style={{textAlign:'center',fontSize:'1vw'}}>
-                
-                <NavMenu>
-                    <NavLink to='/' style={{fontSize:'2vw'}}>
-                        Sbuilt
-                    </NavLink>
-                    <section style={{display:'flex'}}>
-                        <NavLink to='/' onClick={() => {
-                            this.state.jumpTo = 'landing'
-                            this.scrollToSection()
-                        }}>Home</NavLink>
-                        <NavLink to='/' onClick={() => {
-                            this.state.jumpTo = 'about-us'
-                            this.scrollToSection()
-                        }}>About us</NavLink>
-                        <NavLink to='/' onClick={() => {
-                            this.state.jumpTo = 'catalog'
-                            this.scrollToSection()
-                        }}>Catalog</NavLink>
-                        <NavLink to='/3d'>
-                            3D
-                        </NavLink>
-                        
-                    </section>
-                </NavMenu>
-            </div>
-        )
-    }
+    return (
+        <>
+            <IconContext.Provider value={{ color: "black",}}>
+                <Nav>
+                <Navbarcontainer>
+                    <Navlogo to='/'>
+                    <img  src={mainLogo} style={{width:'100px'}}/>
+                    </Navlogo>
+                    <HambergerIcon onClick={clickedHandler}>{click ? <FaTimes /> : <FaBars />}</HambergerIcon>
+                    <NavMenu onClick={clickedHandler} click={click}>
+                        <NavItem >
+                            <NavLink to='/'>หน้าหลัก</NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink to='/About'>แคตตาล้อก</NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink to='/3d'>ออกแบบ</NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink to='/Contact'>ติดต่อเรา</NavLink>
+                        </NavItem>                     
+                    </NavMenu>
+                    </Navbarcontainer>
+                </Nav>
+            </IconContext.Provider>
+        </>
+    )
 }
+
 export default Navbar

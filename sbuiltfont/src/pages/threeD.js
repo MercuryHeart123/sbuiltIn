@@ -183,12 +183,7 @@ const ThreeD = () =>{
         
         return(
             <div>
-                <button onClick={()=>{setPlaneD(
-                    {x:planeD.x+1,
-                    y:1,
-                    z:planeD.z+1,}
 
-                )}}>change</button>
             <Suspense fallback={null} style={{display:'block'}}>
                 <Canvas>
                     <Control type={isDrag}/>
