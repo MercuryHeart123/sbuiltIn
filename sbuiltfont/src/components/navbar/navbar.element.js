@@ -17,6 +17,7 @@ font-size:1.1rem;
 position:sticky;
 top:0;
 z-index:999;
+border-bottom: 2px solid #DCDCDC;
 `
 
 export const Navbarcontainer = styled(Container)` //Navbar container 
@@ -24,6 +25,7 @@ export const Navbarcontainer = styled(Container)` //Navbar container
     font-family: 'Prompt', sans-serif;
     justify-content:space-between;
     height:80px;
+    
     ${Container}
 `
 
@@ -32,7 +34,7 @@ export const Navlogo = styled(Link)` //Navlogo include text and icon
  justify-content:flex-start;
  cursor:pointer;
  text-decoration:none;
- font-size:1.8rem;
+ font-size:1.2rem;
  display:flex;
  align-items:center;
 `

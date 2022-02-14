@@ -1,12 +1,16 @@
 import React, {useState, useRef, useEffect, Suspense} from 'react'
-import { Canvas, useThree, useFrame } from 'react-three-fiber'
+import { Canvas, useThree, useFrame,extend } from 'react-three-fiber'
 import { useSpring, a } from '@react-spring/three'
 import { useDrag } from "@use-gesture/react"
 import * as THREE from "three"
-import { OrbitControls, useHelper } from '@react-three/drei'
+
 import './style.css'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
+
+
+extend({ OrbitControls })
 
 const Control= (props) => {
     const orbitRef = useRef(null);
@@ -17,20 +21,15 @@ const Control= (props) => {
     })
 
 
-    return(
-        <>
-        <OrbitControls
-        
-            maxPolarAngle={Math.PI/3}
-            minPolarAngle={Math.PI/3}
-            args={[camera, gl.domElement]}
-            ref={orbitRef}
-            enabled={!props.type}
+    return (
+        <orbitControls
+         enabled={!props.type}
+          maxPolarAngle={Math.PI / 3}
+          minPolarAngle={Math.PI / 3}
+          args={[camera, gl.domElement]}
+          ref={orbitRef}
         />
-
-        </>
-        
-    )
+      )
 }
 
 const BoxImport = ({ dimension, setIsDrag, plane }) => {
@@ -70,7 +69,7 @@ const BoxImport = ({ dimension, setIsDrag, plane }) => {
             const dracoLoader = new DRACOLoader();
             dracoLoader.setDecoderPath( 'three/examples/js/libs/draco/' );
             loader.setDRACOLoader( dracoLoader );
-            loader.load('model/box.gltf', async function(gltf){
+            loader.load('model/erwr.gltf', async function(gltf){
                 
                 gltf.scene.traverse( function ( child ) {
                     if ( child.isMesh ) {
@@ -127,7 +126,7 @@ const BoxImport = ({ dimension, setIsDrag, plane }) => {
 const Plane = ({dimension}) => {
     const planeRef = useRef()
 
-    useHelper(planeRef, THREE.BoxHelper, 'red')
+    // useHelper(planeRef, THREE.BoxHelper, 'red')
     return (
         <mesh ref={planeRef} position={[0, dimension.y/(-2), 0]} scale={[dimension.x,dimension.y,dimension.z]} userData={{ground:true}} >
             <boxBufferGeometry
@@ -184,7 +183,7 @@ const ThreeD = () =>{
         return(
             <div>
 
-            <Suspense fallback={null} style={{display:'block'}}>
+            <Suspense fallback={<div></div>} style={{display:'block'}}>
                 <Canvas>
                     <Control type={isDrag}/>
                     <ambientLight/>

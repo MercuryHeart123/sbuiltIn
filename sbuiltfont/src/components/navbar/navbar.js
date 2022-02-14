@@ -15,7 +15,7 @@ const Navbar = () => {
                 <Nav>
                 <Navbarcontainer>
                     <Navlogo to='/'>
-                    <img  src={mainLogo} style={{width:'100px'}}/>
+                    <img  src={mainLogo} style={{width:'80px'}} alt=''/>
                     </Navlogo>
                     <HambergerIcon onClick={clickedHandler}>{click ? <FaTimes /> : <FaBars />}</HambergerIcon>
                     <NavMenu onClick={clickedHandler} click={click}>
@@ -23,13 +23,13 @@ const Navbar = () => {
                             <NavLink to='/'>หน้าหลัก</NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink to='/About'>แคตตาล้อก</NavLink>
+                            <NavLink to='/catalog'>แคตตาล้อก</NavLink>
                         </NavItem>
                         <NavItem>
                             <NavLink to='/3d'>ออกแบบ</NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink to='/Contact'>ติดต่อเรา</NavLink>
+                            <NavLink to='/contact'>ติดต่อเรา</NavLink>
                         </NavItem>                     
                     </NavMenu>
                     </Navbarcontainer>
