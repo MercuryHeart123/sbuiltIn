@@ -4,7 +4,7 @@ import { Container } from '../../globalstyle'
 import { Button } from '../navbar/navbar.element'
 import { Info,InfoColumn,InfoRow,TextWrapper,Topline,Heading,Subtitle, ImageWrapper, Img } from './infosection.element'
 
-const InfoSection = ({ lightBg,imgStart,lightTopLine,lightText,lightTextDesc,topline,headline,description,buttonLabel,primary,img,start}) => {
+const InfoSection = ({ lightBg,imgStart,lightTopLine,lightText,lightTextDesc,topline,headline,description,buttonLabel,primary,img,start,buttonlink,buttonshow}) => {
     return (
         <>
             <Info lightBg = {lightBg}>
@@ -15,7 +15,7 @@ const InfoSection = ({ lightBg,imgStart,lightTopLine,lightText,lightTextDesc,top
                                 <Topline lightTopLine={lightTopLine}>{topline}</Topline>
                                 <Heading lightText = {lightText}>{headline}</Heading>
                                 <Subtitle lightTextDesc={lightTextDesc}>{description}</Subtitle>
-                                <Link to='#'>
+                                <Link to= {buttonlink} style={{display:buttonshow}}>
                                     <Button primary={primary} Big fontBig>{buttonLabel}</Button>
                                 </Link>
                             </TextWrapper>
