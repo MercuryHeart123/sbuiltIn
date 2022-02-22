@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, Suspense } from 'react'
+import React, { Fragment, useCallback, useMemo, useState, useRef, useEffect, Suspense } from 'react'
 import { Canvas, useThree, useFrame, extend } from 'react-three-fiber'
 import { useSpring, a } from '@react-spring/three'
 import { useDrag } from "@use-gesture/react"
@@ -47,13 +47,30 @@ const Control = ({ type, setAngle, lookAt }) => {
         </>
     )
 }
+function Line({ defaultStart, defaultEnd }) {
+    const [start, setStart] = useState(defaultStart)
+    const [end, setEnd] = useState(defaultEnd)
+    const vertices = useMemo(() => [start, end].map((v) => new THREE.Vector3(...v)), [start, end])
+    const lineRef = useRef()
 
-const BoxImport = ({ modelName, dimension, setIsDrag, plane, setObj, currentObj, setLookAt }) => {
+    const lineGeometry = new THREE.BufferGeometry().setFromPoints(vertices)
+    return (
+        <>
+            <line ref={lineRef} geometry={lineGeometry}>
+                <lineBasicMaterial color="red" />
+            </line>
+        </>
+    )
+}
+
+
+
+const BoxImport = ({ modelName, dimension, setIsDrag, plane, setObj, currentObj, setLookAt, objGroup, setObjGroup }) => {
     const dragObjectRef = useRef();
     const [pos, setPos] = useState([0, 0, 0]);
     const [turn, setTurn] = useState(0)
     const [opts, setOpts] = useState({
-        font: "Philosopher",
+        // font: "Philosopher",
         fontSize: 0.1,
         color: "#000000",
         maxWidth: 100,
@@ -70,6 +87,7 @@ const BoxImport = ({ modelName, dimension, setIsDrag, plane, setObj, currentObj,
     let planeIntersectPoint = new THREE.Vector3();
     const [planePoint, setPlanePoint] = useState()
     const [spring, api] = useSpring(() => ({}));
+    const { scene, camera } = useThree()
 
     const isInPlane = (planeIntersectPoint) => {
         if ((Math.abs(planeIntersectPoint.x) + modelSize.x <= dimension.x / 2
@@ -79,11 +97,134 @@ const BoxImport = ({ modelName, dimension, setIsDrag, plane, setObj, currentObj,
         }
         // return true if object in plane area
     }
-    const { scene, camera } = useThree()
+    function randomIntFromInterval(min, max) { // min and max included 
+        return Math.random() * (max - min + 1) + min
+    }
+
+    function createBegin() {
+        let index = searchByUuid(modelName)
+        let storeLine = []
+        if (model && objGroup) {
+            if (index.selfIndex == 0) {
+
+                storeLine.push(<Line
+                    defaultStart={[-modelSize.x, modelSize.y, 0]}
+                    defaultEnd={[-modelSize.x, modelSize.y + 0.2, 0]}
+                />)
+            }
+            return storeLine
+        }
+
+    }
+
+    function createEnd() {
+        let index = searchByUuid(modelName)
+        let storeLine = []
+        if (model && objGroup) {
+            if (index.selfIndex == (objGroup[index.parentIndex].length - 1)) {
+                storeLine.push(<Line
+                    defaultStart={[modelSize.x, modelSize.y, 0]}
+                    defaultEnd={[modelSize.x, modelSize.y + 0.2, 0]}
+                />)
+            }
+            return storeLine
+        }
+
+    }
+
+    const searchByUuid = (uuid) => {
+        for (let i = 0; i < objGroup.length; i++) {
+            let finding = objGroup[i]
+            let index = finding.indexOf(uuid)
+            if (index > -1) {
+                return {
+                    parentIndex: i,
+                    selfIndex: index
+                }
+            }
+        }
+    }
+
+    const computeGroup = (moveBox, StayBox, side) => {
+        let tmpObjGroup = objGroup
+        let lenOfMoveBoxGroup = objGroup[moveBox.parentIndex].length
+        if (moveBox.selfIndex > 0 && moveBox.selfIndex < lenOfMoveBoxGroup) {
+            return
+        }
+
+        let uuid = objGroup[moveBox.parentIndex][moveBox.selfIndex]
+        if (side == "LEFT") {
+            tmpObjGroup[StayBox.parentIndex].push(uuid)
+        }
+        else if (side == "RIGHT") {
+            tmpObjGroup[StayBox.parentIndex].unshift(uuid)
+        }
+        if (lenOfMoveBoxGroup <= 1) {
+            tmpObjGroup.splice(moveBox.parentIndex, 1)
+        }
+        else {
+            tmpObjGroup[moveBox.parentIndex].splice(moveBox.selfIndex, 1)
+        }
+        setObjGroup(tmpObjGroup)
+    }
+
+    const computeSeparate = (moveBox) => {
+        let lenOfMoveBox = objGroup[moveBox.parentIndex].length
+        if (lenOfMoveBox <= 1) {
+            return
+        }
+        let tmpArr = objGroup[moveBox.parentIndex]
+        let tmpValue = objGroup[moveBox.parentIndex][moveBox.selfIndex]
+        let leftArray = tmpArr.slice(0, moveBox.selfIndex)
+        let rightArray = tmpArr.slice(moveBox.selfIndex + 1, lenOfMoveBox)
+        let separateGroup = objGroup
+        separateGroup.splice(moveBox.parentIndex, 1)
+        if (leftArray.length > 0) {
+            separateGroup.push(leftArray)
+        }
+        if (rightArray.length > 0) {
+            separateGroup.push(rightArray)
+        }
+        separateGroup.push([tmpValue])
+    }
+
+    useEffect(async () => {
+        if (!model) {
+            const loader = new GLTFLoader();
+            const dracoLoader = new DRACOLoader();
+            dracoLoader.setDecoderPath('three/examples/js/libs/draco/');
+            loader.setDRACOLoader(dracoLoader);
+            loader.load(`model/${modelName}.gltf`, async function (gltf) {
+
+                gltf.scene.traverse((obj) => {
+                    obj.userData.name = modelName
+                })
+                var box = new THREE.Box3().setFromObject(gltf.scene);
+                box.center(gltf.scene.position); // this re-sets the mesh position
+                gltf.scene.position.multiplyScalar(- 1)
+                var pivot = new THREE.Group();
+                pivot.add(gltf.scene);
+                var box = new THREE.Box3().setFromObject(gltf.scene);
+                setModelSize(box.max)
+                if (box.min.y < 0) {
+                    let x = randomIntFromInterval(-2.5, 2.5)
+                    let z = randomIntFromInterval(-2.5, 2.5)
+                    setPos([x, box.max.y, z])
+                    setSavePos([x, box.max.y, z])
+                }
+                let arrGroup = objGroup
+                arrGroup.push([modelName])
+                setObjGroup(arrGroup)
+                setModel(pivot)
+            })
+        }
+
+    }, [])
 
     useFrame(() => {
         if ((model && currentObj == model.uuid)) {
             if (planePoint) {
+
                 let arr = scene.children.filter((obj) => {
                     if (obj.type == "Mesh" && obj.userData.name !== modelName && !obj.userData.ground) {
                         return obj
@@ -139,11 +280,15 @@ const BoxImport = ({ modelName, dimension, setIsDrag, plane, setObj, currentObj,
                         console.log("SE");
                     }
                     else if (otherBox3.containsPoint(vecNE)) {
-                        console.log("NE");
+                        let indexOfOtherBox = searchByUuid(arr[i].userData.name)
+                        let indexOfThisBox = searchByUuid(modelName)
+                        computeGroup(indexOfThisBox, indexOfOtherBox, "RIGHT")
                         setSavePos([otherBox3.min.x - modelSize.x, planePoint[1], otherBox3.max.z - modelSize.z])
                     }
                     else if (otherBox3.containsPoint(vecNW)) {
-                        console.log("NW");
+                        let indexOfOtherBox = searchByUuid(arr[i].userData.name)
+                        let indexOfThisBox = searchByUuid(modelName)
+                        computeGroup(indexOfThisBox, indexOfOtherBox, "LEFT")
                         setSavePos([otherBox3.max.x + modelSize.x, planePoint[1], otherBox3.max.z - modelSize.z])
                     }
                     else if (otherBox3.containsPoint(vecSW)) {
@@ -173,6 +318,8 @@ const BoxImport = ({ modelName, dimension, setIsDrag, plane, setObj, currentObj,
                     }
                 }
                 if (state.active) {
+                    let indexOfThisBox = searchByUuid(modelName)
+                    computeSeparate(indexOfThisBox)
                     setSavePos(state.planePoint)
                 }
                 setPos(savePos)
@@ -235,42 +382,9 @@ const BoxImport = ({ modelName, dimension, setIsDrag, plane, setObj, currentObj,
         },
     );
 
-    function randomIntFromInterval(min, max) { // min and max included 
-        return Math.random() * (max - min + 1) + min
-    }
 
-    useEffect(async () => {
-        if (!model) {
-            const loader = new GLTFLoader();
-            const dracoLoader = new DRACOLoader();
-            dracoLoader.setDecoderPath('three/examples/js/libs/draco/');
-            loader.setDRACOLoader(dracoLoader);
-            loader.load(`model/${modelName}.gltf`, async function (gltf) {
 
-                gltf.scene.traverse((obj) => {
-                    obj.userData.name = modelName
-                })
-                var box = new THREE.Box3().setFromObject(gltf.scene);
-                box.center(gltf.scene.position); // this re-sets the mesh position
-                gltf.scene.position.multiplyScalar(- 1)
-                var pivot = new THREE.Group();
-                pivot.add(gltf.scene);
-                var box = new THREE.Box3().setFromObject(gltf.scene);
-                setModelSize(box.max)
-                console.log(box);
-                if (box.min.y < 0) {
-                    let x = randomIntFromInterval(-2.5, 2.5)
-                    let z = randomIntFromInterval(-2.5, 2.5)
-                    setPos([x, box.max.y, z])
-                    setSavePos([x, box.max.y, z])
-                }
-                setModel(pivot)
-            })
-        }
-
-    }, [])
-
-    useHelper(dragObjectRef, (model && currentObj == model.uuid) ? THREE.BoxHelper : null, "blue")
+    // useHelper(dragObjectRef, (model && currentObj == model.uuid) ? THREE.BoxHelper : null, "blue")
 
     return (model ?
 
@@ -304,14 +418,17 @@ const BoxImport = ({ modelName, dimension, setIsDrag, plane, setObj, currentObj,
             >
                 <text
                     position-z={0}
-                    position-y={1.3}
+                    position-y={modelSize.y + 0.15}
                     {...opts}
-                    text={`50`}
+                    // text={`${Math.round(modelSize.x * 100) / 100}`}
+                    text={modelName}
                     anchorX="center"
                     anchorY="middle"
                 >
-
                 </text>
+                <Line defaultStart={[-modelSize.x, modelSize.y + 0.1, 0]} defaultEnd={[modelSize.x, modelSize.y + 0.1, 0]} />
+                {createBegin()}
+                {createEnd()}
             </primitive>
 
 
@@ -454,6 +571,7 @@ const ThreeD = () => {
     const [isDrag, setIsDrag] = useState(false)
     const [planeD, setPlaneD] = useState({ x: 5, y: 1, z: 5 })
     const [currentObj, setObj] = useState()
+    const [objGroup, setObjGroup] = useState([])
     const [lookAt, setLookAt] = useState([0, 0, 0])
     const [activeWall, setActiveWall] = useState(false)
 
@@ -462,13 +580,29 @@ const ThreeD = () => {
         return <Wall angle={angle} dimension={planeD} face={index} />
     })
     return (
-        <div>
-            <button style={{ position: "fixed", zIndex: '10' }} onClick={
+        <div style={{
+            display: 'flex',
+            flexDirection: 'row-reverse',
+        }}>
+            {/* <button style={{ position: "fixed", zIndex: '10' }} onClick={
                 () => {
                     setActiveWall(!activeWall)
                     setLookAt([0, 0, 0])
                 }
-            }>Wall</button>
+            }>Wall</button> */}
+            <div style={{
+                display: 'flex',
+                flexDirection: 'row',
+                position: "fixed",
+                zIndex: '10',
+                margin: '20px',
+                background: 'rgba(201, 208, 210, .4)',
+                minWidth: '20vw',
+                minHeight: '70vh'
+            }}>
+                <h1 style={{ margin: "0 auto" }}>3D Model</h1>
+            </div>
+
             <Suspense fallback={null} style={{ display: 'block' }}>
                 <Canvas style={{ zIndex: '0' }}>
                     <Control setAngle={setAngle} type={isDrag} lookAt={lookAt} />
@@ -482,7 +616,10 @@ const ThreeD = () => {
                         plane={floorPlane}
                         currentObj={currentObj}
                         setObj={setObj}
-                        setLookAt={setLookAt} />
+                        setLookAt={setLookAt}
+                        objGroup={objGroup}
+                        setObjGroup={setObjGroup}
+                    />
                     <BoxImport
                         modelName='model2'
                         dimension={planeD}
@@ -490,7 +627,10 @@ const ThreeD = () => {
                         plane={floorPlane}
                         currentObj={currentObj}
                         setObj={setObj}
-                        setLookAt={setLookAt} />
+                        setLookAt={setLookAt}
+                        objGroup={objGroup}
+                        setObjGroup={setObjGroup}
+                    />
                     <BoxImport
                         modelName='model3'
                         dimension={planeD}
@@ -498,7 +638,10 @@ const ThreeD = () => {
                         plane={floorPlane}
                         currentObj={currentObj}
                         setObj={setObj}
-                        setLookAt={setLookAt} />
+                        setLookAt={setLookAt}
+                        objGroup={objGroup}
+                        setObjGroup={setObjGroup}
+                    />
                     {activeWall && createWall}
 
                 </Canvas>
