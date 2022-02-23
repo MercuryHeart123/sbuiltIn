@@ -3,11 +3,16 @@ import { Container } from '../../globalstyle'
 
 export const Info = styled.div`
 color:#fff;
-padding:160px 0;
-margin: 30px;
+padding:60px 0;
+margin: 10px;
 border-radius: 20px;
-background:${({ lightBg }) => lightBg ? '#fff' : '#FA6F6F'};
+background:${'white'};
 font-family: 'Prompt', sans-serif;
+`
+
+export const Sectionmin = styled.div`
+padding: 20px;
+background:'blue';
 `
 
 export const InfoRow  = styled.div`  //แนวนอน 

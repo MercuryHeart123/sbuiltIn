@@ -4,9 +4,10 @@ import { Container } from '../../globalstyle'
 import { Button } from '../navbar/navbar.element'
 import { Info,InfoColumn,InfoRow,TextWrapper,Topline,Heading,Subtitle, ImageWrapper, Img } from './infosection.element'
 
-const InfoSection = ({ lightBg,imgStart,lightTopLine,lightText,lightTextDesc,topline,headline,description,buttonLabel,primary,img,start,buttonlink,buttonshow}) => {
+const InfoSection = ({ lightBg,imgStart,lightTopLine,lightText,lightTextDesc,topline,headline,description,buttonLabel,primary,img,start,buttonlink,buttonshow,Sectionmin}) => {
     return (
         <>
+        <section style={{padding:'25px', background:`${lightBg ? lightBg : '#fff'}`}}>
             <Info lightBg = {lightBg}>
                 <Container>
                     <InfoRow imgStart={imgStart}>
@@ -28,6 +29,7 @@ const InfoSection = ({ lightBg,imgStart,lightTopLine,lightText,lightTextDesc,top
                     </InfoRow>
                 </Container>
             </Info>
+        </section>
         </>
     )
 }

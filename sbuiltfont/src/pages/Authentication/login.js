@@ -42,7 +42,8 @@ const Login = (props) => {
     return (
         <div
             style={{
-                padding: "2vw",
+                paddingBottom: "20vh",
+                paddingTop:"9vh",
                 width: "30vw",
                 margin: "0 auto",
                 textAlign: "left",

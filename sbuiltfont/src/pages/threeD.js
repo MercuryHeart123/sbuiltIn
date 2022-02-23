@@ -583,6 +583,7 @@ const ThreeD = () => {
         <div style={{
             display: 'flex',
             flexDirection: 'row-reverse',
+            fontFamily:'Prompt'
         }}>
             {/* <button style={{ position: "fixed", zIndex: '10' }} onClick={
                 () => {
@@ -592,15 +593,40 @@ const ThreeD = () => {
             }>Wall</button> */}
             <div style={{
                 display: 'flex',
-                flexDirection: 'row',
+                flexDirection: 'column',
                 position: "fixed",
                 zIndex: '10',
                 margin: '20px',
-                background: 'rgba(201, 208, 210, .4)',
+                background: '#F1EDED',
                 minWidth: '20vw',
-                minHeight: '70vh'
+                minHeight: '60vh',
+                border:'1px solid #DCDCDC',
+                borderRadius:'18px',
+                padding: '10px',
             }}>
-                <h1 style={{ margin: "0 auto" }}>3D Model</h1>
+                <div style={{ margin: "0 auto", borderBottom:'1px solid black',height:'35px',width:'95%',textAlign:'center'}}>
+                    <h1 style={{fontSize:'28px',}}>Models</h1>
+                </div>
+
+                <div className='modelType' style={{display: 'flex', flexDirection:'column',padding:'15px'}}>
+                    <div className='HeaderTopic'>
+                        <h5 style={{textDecoration:'underline'}}>โครงตู้:</h5>
+                    </div>
+                    <div className='ItemList'>
+                        Model
+                    </div>
+                </div>
+
+                <div className='modelType' style={{display: 'flex', flexDirection:'column',padding:'8px'}}>
+                    <div className='HeaderTopic'>
+                        <h5 style={{textDecoration:'underline'}}>ภายในตู้:</h5>
+                    </div>
+                    <div className='ItemList'>
+                        Model
+                    </div>
+                </div>
+
+
             </div>
 
             <Suspense fallback={null} style={{ display: 'block' }}>

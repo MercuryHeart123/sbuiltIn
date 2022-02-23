@@ -39,7 +39,7 @@ const images=[
 const Catalog = ()=>{
     return(
         <>
-        <ResponsiveGallery images={images}/>
+        <ResponsiveGallery images={images} useLightBox imagesStyle={'radius'}/>
         </>
     )
 }

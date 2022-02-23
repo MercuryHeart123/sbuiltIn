@@ -4,13 +4,13 @@ import svg3 from '../../../src/contact.svg'
 import svg4 from '../../../src/contacts.gif'
 export const HomeObj1 = { //Object2 in Home 
     primary:false,
-    lightBg:true,
+    lightBg:'#fff',
     imgStart:false,
     lightTopLine:false,
     lightText:false,
     lightTextDesc:false,
     topline:'เฟอร์นิเจอร์บิ้วอิน',
-    headline:'ออกแบบเฟอร์นิเจอร์ตามไสตล์ที่ต้องการด้วยตัวคุณเอง',
+    headline:'ออกแบบเฟอร์นิเจอร์ตามสไตล์ที่ต้องการด้วยตัวคุณเอง',
     description:'คุณสามารถออกแบบตู้เสื้อผ้าได้ตามต้องการด้วยตัวคุณเอง',
     buttonLabel:'ออกแบบเลย',
     start:true,
@@ -21,7 +21,7 @@ export const HomeObj1 = { //Object2 in Home
 
 export const HomeObj2 = { //Object1 in Home 
     primary:false,
-    lightBg:true,
+    lightBg:'#F6F6F6',
     imgStart:true,
     lightTopLine:false,
     lightText:false,
@@ -39,7 +39,7 @@ export const HomeObj2 = { //Object1 in Home
 
 export const HomeObj3 = { //Object3 in Home 
     primary:true,
-    lightBg:false,
+    lightBg:'#FA6F6F',
     imgStart:false,
     lightTopLine:false,
     lightText:false,
@@ -51,12 +51,13 @@ export const HomeObj3 = { //Object3 in Home
     start:true,
     img: svg4,
     buttonlink:'m.me/minnn7410',
-    buttonshow:'none'
+    buttonshow:'none',
+    positionfixed:true
 }
 
 export const HomeObj4 = { //Object4 in Home 
     primary:false,
-    lightBg:true,
+    lightBg:'#fff',
     imgStart:false,
     lightTopLine:false,
     lightText:false,
