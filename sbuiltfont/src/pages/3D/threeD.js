@@ -6,6 +6,11 @@ import Plane from './plane'
 import Control from './control'
 import ImportModel from './importmodel'
 import Wall from './wall'
+import * as fi from 'react-icons/fi'
+import * as ri from 'react-icons/ri'
+
+
+
 
 const ThreeD = () => {
     const [angle, setAngle] = useState(0)
@@ -15,24 +20,11 @@ const ThreeD = () => {
     const [objGroup, setObjGroup] = useState([])
     const [lookAt, setLookAt] = useState([0, 0, 0])
     const [activeWall, setActiveWall] = useState(false)
+    const [showMenu, setShowMenu] = useState(false)
 
-    const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-    const createWall = [0, 0, 0, 0].map((item, index) => {
-        return <Wall angle={angle} dimension={planeD} face={index} />
-    })
-    return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'row-reverse',
-            fontFamily: 'Prompt'
-        }}>
-            {/* <button style={{ position: "fixed", zIndex: '10' }} onClick={
-                () => {
-                    setActiveWall(!activeWall)
-                    setLookAt([0, 0, 0])
-                }
-            }>Wall</button> */}
-            {/* <div style={{
+    const createMenu = () => {
+        return (
+            <div style={{
                 display: 'flex',
                 flexDirection: 'column',
                 position: "fixed",
@@ -45,6 +37,14 @@ const ThreeD = () => {
                 borderRadius: '18px',
                 padding: '10px',
             }}>
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'row-reverse',
+                }}>
+                    <ri.RiCloseFill onClick={() => {
+                        setShowMenu(false)
+                    }} />
+                </div>
                 <div style={{ margin: "0 auto", borderBottom: '1px solid black', height: '35px', width: '95%', textAlign: 'center' }}>
                     <h1 style={{ fontSize: '28px', }}>Models</h1>
                 </div>
@@ -68,8 +68,39 @@ const ThreeD = () => {
                 </div>
 
 
-            </div> */}
+            </div>
+        )
+    }
 
+    const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+    const createWall = [0, 0, 0, 0].map((item, index) => {
+        return <Wall angle={angle} dimension={planeD} face={index} />
+    })
+    return (
+        <div style={{
+            display: 'flex',
+            flexDirection: 'row-reverse',
+            fontFamily: 'Prompt'
+        }}>
+            {/* <button style={{ position: "fixed", zIndex: '10' }} onClick={
+                () => {
+                    setActiveWall(!activeWall)
+                    setLookAt([0, 0, 0])
+                }
+            }>Wall</button> */}
+            {!showMenu && <fi.FiMenu style={{
+                display: 'flex',
+                flexDirection: 'column',
+                position: "fixed",
+                zIndex: '11',
+                margin: '10px',
+                minWidth: '5vw',
+                minHeight: '5vh',
+                padding: '10px',
+            }} onClick={() => {
+                setShowMenu(true)
+            }} />}
+            {showMenu && createMenu()}
             <Suspense fallback={null} style={{ display: 'block' }}>
                 <Canvas style={{ zIndex: '0' }}>
                     <Control setAngle={setAngle} type={isDrag} lookAt={lookAt} />

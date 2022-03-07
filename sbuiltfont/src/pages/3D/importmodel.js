@@ -50,33 +50,30 @@ const ImportModel = ({ modelName, dimension, setIsDrag, plane, setObj, currentOb
 
     function createBegin() {
         let index = searchByUuid(modelName)
-        let storeLine = []
         if (model && objGroup) {
             if (index.selfIndex === 0) {
 
-                storeLine.push(<Line
+                return (<Line
                     position={pos}
                     defaultStart={[-modelSize.x, modelSize.y, 0]}
                     defaultEnd={[-modelSize.x, modelSize.y + 0.2, 0]}
                 />)
             }
-            return storeLine
+
         }
 
     }
 
     function createEnd() {
         let index = searchByUuid(modelName)
-        let storeLine = []
         if (model && objGroup) {
             if (index.selfIndex == (objGroup[index.parentIndex].length - 1)) {
-                storeLine.push(<Line
+                return (<Line
                     position={pos}
                     defaultStart={[modelSize.x, modelSize.y, 0]}
                     defaultEnd={[modelSize.x, modelSize.y + 0.2, 0]}
                 />)
             }
-            return storeLine
         }
 
     }
