@@ -7,7 +7,7 @@ import {
 import Footer from './components/footer/footer';
 import Navbar from './components/navbar/navbar';
 import Home from './pages/Home/home';
-import ThreeD from './pages/threeD';
+import ThreeD from './pages/3D/threeD';
 import Catalog from './pages/Catalog/catalog'
 import Contact from './pages/Contact/contact';
 import ScrollToTop from './scrolltop'
