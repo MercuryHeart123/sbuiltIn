@@ -8,6 +8,7 @@ import ImportModel from './importmodel'
 import Wall from './wall'
 import * as fi from 'react-icons/fi'
 import * as ri from 'react-icons/ri'
+import { v4 as uuidv4 } from 'uuid';
 
 
 
@@ -20,7 +21,54 @@ const ThreeD = () => {
     const [objGroup, setObjGroup] = useState([])
     const [lookAt, setLookAt] = useState([0, 0, 0])
     const [activeWall, setActiveWall] = useState(false)
-    const [showMenu, setShowMenu] = useState(false)
+    const [showMenu, setShowMenu] = useState(true)
+    const [allModel, setAllModel] = useState()
+
+    const dummyModel = [{
+        title: '60x120',
+        modelName: '3dyabyab',
+        modelPath: 'model/3dyabyab.gltf',
+        previewPath: 'https://cdn.pixabay.com/photo/2017/01/14/12/59/iceland-1979445_960_720.jpg'
+    },
+    {
+        title: '70x120',
+        modelName: 'model2',
+        modelPath: 'model/model2.gltf',
+        previewPath: 'https://cdn.pixabay.com/photo/2019/06/12/15/07/cat-4269479_960_720.jpg'
+    },
+    {
+        title: '80x120',
+        modelName: 'model3',
+        modelPath: 'model/model3.gltf',
+        previewPath: 'https://cdn.pixabay.com/photo/2016/12/04/21/58/rabbit-1882699_960_720.jpg'
+    },
+
+    ]
+
+    const createMenuModel = (dummyModel) => {
+        return dummyModel.map((item, index) => {
+            return <img
+                src={item.previewPath}
+                style={{ maxHeight: '6vw', maxWidth: '6vw', padding: '5px' }}
+                onClick={() => {
+                    item.modelUuid = uuidv4()
+                    item.create = true
+                    if (!allModel) {
+                        setAllModel([item])
+                    }
+                    else {
+
+                        // const tm = allModel;
+                        // tm.push(item)
+                        // allModel.push(item)
+                        // console.log(allModel);
+                        setAllModel([...allModel, item])
+                    }
+
+                }}
+            />
+        })
+    }
 
     const createMenu = () => {
         return (
@@ -53,8 +101,8 @@ const ThreeD = () => {
                     <div className='HeaderTopic'>
                         <h5 style={{ textDecoration: 'underline' }}>โครงตู้:</h5>
                     </div>
-                    <div className='ItemList'>
-                        Model
+                    <div className='ItemList' style={{ textAlign: 'center' }}>
+                        {dummyModel && createMenuModel(dummyModel)}
                     </div>
                 </div>
 
@@ -63,7 +111,21 @@ const ThreeD = () => {
                         <h5 style={{ textDecoration: 'underline' }}>ภายในตู้:</h5>
                     </div>
                     <div className='ItemList'>
-                        Model
+                        {allModel && allModel.map((item, index) => {
+                            return (<>
+                                {item.create && <div onClick={() => {
+                                    allModel[index].create = false
+                                    setAllModel([...allModel])
+                                }} >
+                                    <span style={{ color: item.modelUuid == currentObj ? 'red' : 'green' }}>
+                                        {item.modelName}
+                                    </span>
+                                </div>}
+
+
+                            </>)
+                        })}
+                        {/* {allModel && console.log(allModel)} */}
                     </div>
                 </div>
 
@@ -71,7 +133,27 @@ const ThreeD = () => {
             </div>
         )
     }
+    const createAllModel = () => {
+        return allModel.map((item, index) => {
+            if (item.create) {
+                return (<ImportModel
+                    modelUuid={`${item.modelUuid}`}
+                    modelPath={`${item.modelPath}`}
+                    modelName={`${item.modelName}`}
+                    dimension={planeD}
+                    setIsDrag={setIsDrag}
+                    plane={floorPlane}
+                    currentObj={currentObj}
+                    setObj={setObj}
+                    setLookAt={setLookAt}
+                    objGroup={objGroup}
+                    setObjGroup={setObjGroup}
+                />)
+            }
+            return null
 
+        })
+    }
     const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
     const createWall = [0, 0, 0, 0].map((item, index) => {
         return <Wall angle={angle} dimension={planeD} face={index} />
@@ -107,39 +189,7 @@ const ThreeD = () => {
                     <ambientLight />
                     <Plane dimension={planeD} />
                     <spotLight position={[0, 5, 10]} />
-                    <ImportModel
-                        modelName='3dyabyab'
-                        dimension={planeD}
-                        setIsDrag={setIsDrag}
-                        plane={floorPlane}
-                        currentObj={currentObj}
-                        setObj={setObj}
-                        setLookAt={setLookAt}
-                        objGroup={objGroup}
-                        setObjGroup={setObjGroup}
-                    />
-                    <ImportModel
-                        modelName='model2'
-                        dimension={planeD}
-                        setIsDrag={setIsDrag}
-                        plane={floorPlane}
-                        currentObj={currentObj}
-                        setObj={setObj}
-                        setLookAt={setLookAt}
-                        objGroup={objGroup}
-                        setObjGroup={setObjGroup}
-                    />
-                    <ImportModel
-                        modelName='model3'
-                        dimension={planeD}
-                        setIsDrag={setIsDrag}
-                        plane={floorPlane}
-                        currentObj={currentObj}
-                        setObj={setObj}
-                        setLookAt={setLookAt}
-                        objGroup={objGroup}
-                        setObjGroup={setObjGroup}
-                    />
+                    {allModel && createAllModel()}
                     {activeWall && createWall}
 
                 </Canvas>

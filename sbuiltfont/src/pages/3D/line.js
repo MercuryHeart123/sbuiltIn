@@ -18,7 +18,6 @@ function Line({ position, defaultStart, defaultEnd }) {
 
     const vertices = useMemo(() => [Ds, De].map((v) => new THREE.Vector3(...v)), [Ds, De])
     const lineRef = useRef()
-    const shiftVector = new THREE.Vector3(position[0], position[1], position[2])
     // vertices.map((item, index) => {
     //     return item.add(shiftVector)
     // })

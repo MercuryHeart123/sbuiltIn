@@ -11,11 +11,13 @@ import Line from "./line"
 
 
 extend({ Text });
-const ImportModel = ({ modelName, dimension, setIsDrag, plane, setObj, currentObj, setLookAt, objGroup, setObjGroup }) => {
+const ImportModel = ({ modelUuid, modelPath, modelName, dimension, setIsDrag, plane, setObj, currentObj, setLookAt, objGroup, setObjGroup }) => {
     const dragObjectRef = useRef();
     const [pos, setPos] = useState([0, 0, 0]);
     const [pastActive, setPastActive] = useState(false);
     const [turn, setTurn] = useState(0)
+    const [objUuid, setObjUuid] = useState()
+
     const [opts, setOpts] = useState({
         // font: "Philosopher",
         fontSize: 0.1,
@@ -49,7 +51,7 @@ const ImportModel = ({ modelName, dimension, setIsDrag, plane, setObj, currentOb
     }
 
     function createBegin() {
-        let index = searchByUuid(modelName)
+        let index = searchByUuid(objUuid)
         if (model && objGroup) {
             if (index.selfIndex === 0) {
 
@@ -65,7 +67,7 @@ const ImportModel = ({ modelName, dimension, setIsDrag, plane, setObj, currentOb
     }
 
     function createEnd() {
-        let index = searchByUuid(modelName)
+        let index = searchByUuid(objUuid)
         if (model && objGroup) {
             if (index.selfIndex == (objGroup[index.parentIndex].length - 1)) {
                 return (<Line
@@ -160,11 +162,13 @@ const ImportModel = ({ modelName, dimension, setIsDrag, plane, setObj, currentOb
             const dracoLoader = new DRACOLoader();
             dracoLoader.setDecoderPath('three/examples/js/libs/draco/');
             loader.setDRACOLoader(dracoLoader);
-            loader.load(`model/${modelName}.gltf`, async function (gltf) {
+            loader.load(`${modelPath}`, async function (gltf) {
 
                 gltf.scene.traverse((obj) => {
-                    obj.userData.name = modelName
+
+                    obj.userData.name = modelUuid
                 })
+                setObjUuid(modelUuid)
                 var box = new THREE.Box3().setFromObject(gltf.scene);
                 box.center(gltf.scene.position); // this re-sets the mesh position
                 gltf.scene.position.multiplyScalar(- 1)
@@ -179,7 +183,7 @@ const ImportModel = ({ modelName, dimension, setIsDrag, plane, setObj, currentOb
                     setSavePos([x, box.max.y, z])
                 }
                 let arrGroup = objGroup
-                arrGroup.push([modelName])
+                arrGroup.push([modelUuid])
                 setObjGroup(arrGroup)
                 setModel(pivot)
             })
@@ -188,11 +192,13 @@ const ImportModel = ({ modelName, dimension, setIsDrag, plane, setObj, currentOb
     }, [])
 
     useFrame(() => {
-        if ((model && currentObj == model.uuid)) {
+        if ((model && currentObj == modelUuid)) {
             if (planePoint) {
-
                 let arr = scene.children.filter((obj) => {
-                    if (obj.type == "Mesh" && obj.userData.name !== modelName && !obj.userData.ground) {
+                    if (obj.type == "BoxHelper") {
+                        obj.update()
+                    }
+                    if (obj.type == "Mesh" && obj.userData.name !== objUuid && !obj.userData.ground) {
                         return obj
                     }
 
@@ -250,7 +256,7 @@ const ImportModel = ({ modelName, dimension, setIsDrag, plane, setObj, currentOb
                         let indexOfOtherBox = searchByUuid(arr[i].userData.name)
                         let result = isHeadOrTail(arr[i].userData.name, indexOfOtherBox)
                         if (result == 2 || result == 0) {
-                            let indexOfThisBox = searchByUuid(modelName)
+                            let indexOfThisBox = searchByUuid(objUuid)
                             computeGroup(indexOfThisBox, indexOfOtherBox, "RIGHT")
                             setSavePos([otherBox3.min.x - modelSize.x, planePoint[1], otherBox3.max.z - modelSize.z])
                         }
@@ -260,7 +266,7 @@ const ImportModel = ({ modelName, dimension, setIsDrag, plane, setObj, currentOb
                         let indexOfOtherBox = searchByUuid(arr[i].userData.name)
                         let result = isHeadOrTail(arr[i].userData.name, indexOfOtherBox)
                         if (result == 2 || result == 1) {
-                            let indexOfThisBox = searchByUuid(modelName)
+                            let indexOfThisBox = searchByUuid(objUuid)
                             computeGroup(indexOfThisBox, indexOfOtherBox, "LEFT")
                             setSavePos([otherBox3.max.x + modelSize.x, planePoint[1], otherBox3.max.z - modelSize.z])
                         }
@@ -293,7 +299,7 @@ const ImportModel = ({ modelName, dimension, setIsDrag, plane, setObj, currentOb
                 }
 
                 if (state.active) {
-                    let indexOfThisBox = searchByUuid(modelName)
+                    let indexOfThisBox = searchByUuid(objUuid)
                     computeSeparate(indexOfThisBox)
                     setSavePos(state.planePoint)
                 }
@@ -308,7 +314,7 @@ const ImportModel = ({ modelName, dimension, setIsDrag, plane, setObj, currentOb
         ({ active, movement: [x, y], timeStamp, event }) => {
 
             if (active && !pastActive && !lock) {
-                setObj(model.uuid)
+                setObj(modelUuid)
                 event.ray.intersectPlane(plane, planeIntersectPoint);
                 if (isInPlane(planeIntersectPoint) || firstCome
                 ) {
@@ -359,7 +365,7 @@ const ImportModel = ({ modelName, dimension, setIsDrag, plane, setObj, currentOb
 
 
 
-    useHelper(dragObjectRef, (model && currentObj == model.uuid) ? THREE.BoxHelper : null, "blue")
+    // useHelper(dragObjectRef.current, (model && currentObj == modelUuid) ? THREE.BoxHelper : null, "blue")
 
     return (model ?
 
@@ -380,7 +386,7 @@ const ImportModel = ({ modelName, dimension, setIsDrag, plane, setObj, currentOb
                 //         setLock(!lock)
                 //     }
                 // }}
-                userData={{ name: modelName }}
+                userData={{ name: objUuid }}
 
                 castShadow>
                 <primitive
@@ -392,8 +398,14 @@ const ImportModel = ({ modelName, dimension, setIsDrag, plane, setObj, currentOb
                     opacity={0}
                     {...spring} {...bind()}
                 >
+
                 </primitive>
+
+
             </a.mesh>
+            {dragObjectRef && currentObj == modelUuid &&
+                <boxHelper args={[dragObjectRef.current, "blue"]} />
+            }
             <text
                 position-z={pos[2]}
                 position-x={pos[0]}
