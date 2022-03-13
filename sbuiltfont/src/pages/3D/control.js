@@ -4,10 +4,11 @@ import { useThree, useFrame, extend } from 'react-three-fiber'
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 
 extend({ OrbitControls })
-const Control = ({ type, setAngle, lookAt }) => {
+const Control = ({ type, setAngle, lookAt, setCurrentCamera, setCurrentScene }) => {
     const orbitRef = useRef(null);
-    const { camera, gl } = useThree()
-
+    const { camera, gl, scene } = useThree()
+    setCurrentCamera(camera)
+    setCurrentScene(scene)
     useFrame(() => {
         orbitRef.current.update()
         var vector = new THREE.Vector3(0, 0, -1);

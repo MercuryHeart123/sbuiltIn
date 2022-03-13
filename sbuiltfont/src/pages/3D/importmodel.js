@@ -11,13 +11,12 @@ import Line from "./line"
 
 
 extend({ Text });
-const ImportModel = ({ modelUuid, modelPath, modelName, dimension, setIsDrag, plane, setObj, currentObj, setLookAt, objGroup, setObjGroup }) => {
+const ImportModel = ({ startPosition, modelUuid, modelPath, modelName, dimension, setIsDrag, plane, setObj, currentObj, setLookAt, objGroup, setObjGroup }) => {
     const dragObjectRef = useRef();
     const [pos, setPos] = useState([0, 0, 0]);
     const [pastActive, setPastActive] = useState(false);
     const [turn, setTurn] = useState(0)
     const [objUuid, setObjUuid] = useState()
-
     const [opts, setOpts] = useState({
         // font: "Philosopher",
         fontSize: 0.1,
@@ -46,12 +45,12 @@ const ImportModel = ({ modelUuid, modelPath, modelName, dimension, setIsDrag, pl
         }
         // return true if object in plane area
     }
-    function randomIntFromInterval(min, max) { // min and max included 
-        return Math.random() * (max - min + 1) + min
-    }
 
     function createBegin() {
         let index = searchByUuid(objUuid)
+        if (index.parentIndex == -1) {
+            return null
+        }
         if (model && objGroup) {
             if (index.selfIndex === 0) {
 
@@ -68,6 +67,9 @@ const ImportModel = ({ modelUuid, modelPath, modelName, dimension, setIsDrag, pl
 
     function createEnd() {
         let index = searchByUuid(objUuid)
+        if (index.parentIndex == -1) {
+            return null
+        }
         if (model && objGroup) {
             if (index.selfIndex == (objGroup[index.parentIndex].length - 1)) {
                 return (<Line
@@ -91,6 +93,10 @@ const ImportModel = ({ modelUuid, modelPath, modelName, dimension, setIsDrag, pl
                     selfIndex: index
                 }
             }
+        }
+        return {
+            parentIndex: -1,
+            selfIndex: -1
         }
     }
 
@@ -133,7 +139,7 @@ const ImportModel = ({ modelUuid, modelPath, modelName, dimension, setIsDrag, pl
         else {
             tmpObjGroup[moveBox.parentIndex].splice(moveBox.selfIndex, 1)
         }
-        setObjGroup(tmpObjGroup)
+        setObjGroup([...tmpObjGroup])
     }
 
     const computeSeparate = (moveBox) => {
@@ -154,6 +160,7 @@ const ImportModel = ({ modelUuid, modelPath, modelName, dimension, setIsDrag, pl
             separateGroup.push(rightArray)
         }
         separateGroup.push([tmpValue])
+        setObjGroup([...separateGroup])
     }
 
     useEffect(() => {
@@ -177,8 +184,8 @@ const ImportModel = ({ modelUuid, modelPath, modelName, dimension, setIsDrag, pl
                 box = new THREE.Box3().setFromObject(gltf.scene);
                 setModelSize(box.max)
                 if (box.min.y < 0) {
-                    let x = randomIntFromInterval(-2, 2)
-                    let z = randomIntFromInterval(-2, 2)
+                    let x = startPosition.x
+                    let z = startPosition.z
                     setPos([x, box.max.y, z])
                     setSavePos([x, box.max.y, z])
                 }
@@ -245,6 +252,7 @@ const ImportModel = ({ modelUuid, modelPath, modelName, dimension, setIsDrag, pl
                     planePoint,
                     active: true
                 }
+
                 for (let i = 0; i < arr.length; i++) {
                     let otherBox3 = new THREE.Box3().setFromObject(arr[i])
                     let tmpActive = false

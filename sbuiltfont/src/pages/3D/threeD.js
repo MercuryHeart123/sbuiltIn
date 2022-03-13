@@ -23,6 +23,8 @@ const ThreeD = () => {
     const [activeWall, setActiveWall] = useState(false)
     const [showMenu, setShowMenu] = useState(true)
     const [allModel, setAllModel] = useState()
+    const [currentCamera, setCurrentCamera] = useState()
+    const [currentScene, setCurrentScene] = useState()
 
     const dummyModel = [{
         title: '60x120',
@@ -42,35 +44,83 @@ const ThreeD = () => {
         modelPath: 'model/model3.gltf',
         previewPath: 'https://cdn.pixabay.com/photo/2016/12/04/21/58/rabbit-1882699_960_720.jpg'
     },
-
     ]
 
-    const createMenuModel = (dummyModel) => {
+    function intersect(pos, camera, scene) {
+        const raycaster = new THREE.Raycaster(); // create once
+        raycaster.setFromCamera(pos, camera);
+        return raycaster.intersectObjects(scene.children);
+    }
+
+    const CreateMenuModel = ({ dummyModel }) => {
+
         return dummyModel.map((item, index) => {
             return <img
-                src={item.previewPath}
-                style={{ maxHeight: '6vw', maxWidth: '6vw', padding: '5px' }}
-                onClick={() => {
-                    item.modelUuid = uuidv4()
-                    item.create = true
-                    if (!allModel) {
-                        setAllModel([item])
-                    }
-                    else {
 
-                        // const tm = allModel;
-                        // tm.push(item)
-                        // allModel.push(item)
-                        // console.log(allModel);
-                        setAllModel([...allModel, item])
+                draggable={true}
+                onDragStart={(ev) => {
+                    ev.dataTransfer.effectAllowed = "all";
+                }
+                }
+                onDragOver={(ev) => {
+                    ev.preventDefault();
+                    // Set the dropEffect to move
+                    ev.dataTransfer.dropEffect = "copy"
+                }}
+
+                onDragEnd={(ev) => {
+                    const clickMouse = new THREE.Vector2();
+                    clickMouse.x = (ev.clientX / window.innerWidth) * 2 - 1;
+                    clickMouse.y = -(ev.clientY / window.innerHeight) * 2 + 1;
+                    let found = intersect(clickMouse, currentCamera, currentScene)
+                    if (found.length > 0) {
+                        for (let i = 0; i < found.length; i++) {
+                            if (!found[i].object.userData.ground)
+                                continue
+                            let target = found[i].point;
+                            item.modelUuid = uuidv4()
+                            item.create = true
+                            item.startPosition = target
+                            if (!allModel) {
+                                setAllModel([item])
+                            }
+                            else {
+                                setAllModel([...allModel, item])
+                            }
+                        }
                     }
 
                 }}
+                src={item.previewPath}
+                style={{ maxHeight: '6vw', maxWidth: '6vw', padding: '5px' }}
             />
         })
     }
+    const searchByUuid = (uuid) => {
+        for (let i = 0; i < objGroup.length; i++) {
+            let finding = objGroup[i]
+            let index = finding.indexOf(uuid)
+            console.log(index);
+            if (index > -1) {
+                return {
+                    parentIndex: i,
+                    selfIndex: index
+                }
+            }
+        }
+    }
 
-    const createMenu = () => {
+    const checkIsIsolate = (removeIndex) => {
+        if (objGroup[removeIndex.parentIndex].length > 1) {
+            return false
+        }
+        return true
+
+    }
+
+
+    const CreateMenu = () => {
+
         return (
             <div style={{
                 display: 'flex',
@@ -84,7 +134,12 @@ const ThreeD = () => {
                 border: '1px solid #DCDCDC',
                 borderRadius: '18px',
                 padding: '10px',
-            }}>
+            }}
+                onDragOver={(ev) => {
+                    ev.preventDefault();
+                    ev.dataTransfer.dropEffect = "copy"
+                }}
+            >
                 <div style={{
                     display: 'flex',
                     flexDirection: 'row-reverse',
@@ -102,19 +157,27 @@ const ThreeD = () => {
                         <h5 style={{ textDecoration: 'underline' }}>โครงตู้:</h5>
                     </div>
                     <div className='ItemList' style={{ textAlign: 'center' }}>
-                        {dummyModel && createMenuModel(dummyModel)}
+                        {dummyModel && <CreateMenuModel dummyModel={dummyModel} />}
                     </div>
                 </div>
 
                 <div className='modelType' style={{ display: 'flex', flexDirection: 'column', padding: '8px' }}>
                     <div className='HeaderTopic'>
-                        <h5 style={{ textDecoration: 'underline' }}>ภายในตู้:</h5>
+                        <h5 style={{ textDecoration: 'underline' }}>รายการที่เลือก:</h5>
                     </div>
                     <div className='ItemList'>
                         {allModel && allModel.map((item, index) => {
                             return (<>
                                 {item.create && <div onClick={() => {
                                     allModel[index].create = false
+                                    let removeIndex = searchByUuid(item.modelUuid)
+                                    if (checkIsIsolate(removeIndex)) {
+                                        objGroup.splice(removeIndex.parentIndex, 1)
+                                    }
+                                    else {
+                                        objGroup[removeIndex.parentIndex].splice(removeIndex.selfIndex, 1)
+                                    }
+                                    setObjGroup([...objGroup])
                                     setAllModel([...allModel])
                                 }} >
                                     <span style={{ color: item.modelUuid == currentObj ? 'red' : 'green' }}>
@@ -125,7 +188,6 @@ const ThreeD = () => {
 
                             </>)
                         })}
-                        {/* {allModel && console.log(allModel)} */}
                     </div>
                 </div>
 
@@ -140,6 +202,7 @@ const ThreeD = () => {
                     modelUuid={`${item.modelUuid}`}
                     modelPath={`${item.modelPath}`}
                     modelName={`${item.modelName}`}
+                    startPosition={item.startPosition}
                     dimension={planeD}
                     setIsDrag={setIsDrag}
                     plane={floorPlane}
@@ -148,6 +211,7 @@ const ThreeD = () => {
                     setLookAt={setLookAt}
                     objGroup={objGroup}
                     setObjGroup={setObjGroup}
+                    key={index}
                 />)
             }
             return null
@@ -162,7 +226,7 @@ const ThreeD = () => {
         <div style={{
             display: 'flex',
             flexDirection: 'row-reverse',
-            fontFamily: 'Prompt'
+            fontFamily: 'Prompt',
         }}>
             {/* <button style={{ position: "fixed", zIndex: '10' }} onClick={
                 () => {
@@ -182,17 +246,31 @@ const ThreeD = () => {
             }} onClick={() => {
                 setShowMenu(true)
             }} />}
-            {showMenu && createMenu()}
+            {showMenu && <CreateMenu />}
             <Suspense fallback={null} style={{ display: 'block' }}>
-                <Canvas style={{ zIndex: '0' }}>
-                    <Control setAngle={setAngle} type={isDrag} lookAt={lookAt} />
-                    <ambientLight />
-                    <Plane dimension={planeD} />
-                    <spotLight position={[0, 5, 10]} />
-                    {allModel && createAllModel()}
-                    {activeWall && createWall}
+                <div
+                    onDragOver={(ev) => {
+                        ev.preventDefault();
+                        // Set the dropEffect to move
+                        ev.dataTransfer.dropEffect = "copy"
+                    }}
+                >
+                    <Canvas style={{ zIndex: '0' }}>
+                        <Control
+                            setAngle={setAngle}
+                            type={isDrag}
+                            lookAt={lookAt}
+                            setCurrentCamera={setCurrentCamera}
+                            setCurrentScene={setCurrentScene}
+                        />
+                        <ambientLight />
+                        <Plane dimension={planeD} />
+                        <spotLight position={[0, 5, 10]} />
+                        {allModel && createAllModel()}
+                        {activeWall && createWall}
 
-                </Canvas>
+                    </Canvas>
+                </div>
             </Suspense>
         </div>
 
