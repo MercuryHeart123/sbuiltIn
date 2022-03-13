@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Button } from '../navbar/navbar.element'
 import mainLogo from '../../../src/Logos.png';
+import { useLocation } from 'react-router-dom';
 import {
     FooterContainer,
     FooterSubheading,
@@ -31,6 +32,10 @@ const Footer = () => {
     const handleSubmit = (e) => {
         setvalue('')
         e.preventDefault();
+    }
+    let location = useLocation();
+    if (location.pathname == '/3d') {
+        return null
     }
     return (
         <div>

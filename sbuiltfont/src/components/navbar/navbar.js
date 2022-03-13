@@ -5,6 +5,7 @@ import { IconContext } from "react-icons";
 import mainLogo from '../../../src/Logos.png';
 import axios from 'axios'
 import { connect } from "react-redux";
+import { useLocation } from 'react-router-dom';
 
 const Navbar = (props) => {
     const [click, setclick] = useState(false)
@@ -20,6 +21,11 @@ const Navbar = (props) => {
             })
         })
     }
+    let location = useLocation();
+    if (location.pathname == '/3d') {
+        return null
+    }
+
     return (
         <>
             <IconContext.Provider value={{ color: "black", }}>

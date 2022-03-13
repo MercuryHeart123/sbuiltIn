@@ -95,11 +95,10 @@ app.post("/logout", checkAuth, (req, res) => {
     });
 });
 
-app.get("/edit", async (req,res) => {
-    var path = `mongodb://${process.env.DB_IP}:${process.env.DB_PORT}/sbuiltin`;
+app.get("/edit", async (req, res) => {
     // const { title, image64 } = req.body;
     // let query = { title, image64 };
-    const client = new MongoClient(path);
+    const client = new MongoClient(uri);
     await client.connect();
     const database = client.db("sbuiltin");
     const catalog = database.collection("catalog");
@@ -115,24 +114,23 @@ app.get("/edit", async (req,res) => {
         res.status(404).json({ message: error.message });
 
     }
-}) 
+})
 
 app.post("/edit", async (req, res) => {
-    var path = `mongodb://${process.env.DB_IP}:${process.env.DB_PORT}/sbuiltin`;
     var text = req.body.title;
     var base64 = req.body.image;
     var chkmodel = req.body.model;
     console.log(chkmodel)
-    if(chkmodel == true) {
+    if (chkmodel == true) {
         var model = {
-            title : text,
-            image64 : base64,
+            title: text,
+            image64: base64,
             isModel: chkmodel
         }
-        const client = new MongoClient(path);
+        const client = new MongoClient(uri);
         await client.connect();
         let info = await client.db("sbuiltin").collection("model").insertOne(model);
-        if(info) {
+        if (info) {
             console.log("Data inserted");
             let JSONdata = JSON.stringify({
                 status: "Completed",
@@ -153,13 +151,13 @@ app.post("/edit", async (req, res) => {
     }
     else {
         var cat = {
-            title : text,
-            image64 : base64
+            title: text,
+            image64: base64
         }
-        const client = new MongoClient(path);
+        const client = new MongoClient(uri);
         await client.connect();
         let info = await client.db("sbuiltin").collection("catalog").insertOne(cat);
-        if(info) {
+        if (info) {
             console.log("Data inserted");
             let JSONdata = JSON.stringify({
                 status: "Completed",
