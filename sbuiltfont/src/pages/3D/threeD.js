@@ -73,6 +73,7 @@ const ThreeD = () => {
                     clickMouse.x = (ev.clientX / window.innerWidth) * 2 - 1;
                     clickMouse.y = -(ev.clientY / window.innerHeight) * 2 + 1;
                     let found = intersect(clickMouse, currentCamera, currentScene)
+                    console.log(found, currentScene);
                     if (found.length > 0) {
                         for (let i = 0; i < found.length; i++) {
                             if (!found[i].object.userData.ground)

@@ -14,14 +14,15 @@ const Edit = () => {
     setItems([...items, result]);
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const result = await getItems();
-      console.log('fetch data;m', result)
-      setItems(result)
-    }
-    fetchData()
-  }, [])
+  const fetchData = async () => {
+    const result = await getItems();
+    console.log('fetch data;m', result)
+    setItems(result)
+  }
+
+  // useEffect(() => {
+  //   fetchData()
+  // }, [])
 
   return (
     <div className="container" 
@@ -60,7 +61,9 @@ const Edit = () => {
       </form>
 
       <h4>Delete existing model or catalog data (not finished)</h4>
-      <form action="" onSubmit={useEffect.fetchData}>
+      <form action="" onSubmit={(e) => {
+        e.preventDefault()
+        fetchData()}}>
         <div className='right-align'>
           <button type="submit" className="btn btn-primary btn-block" id="load-data" style={{ marginTop: "2vh" , backgroundColor: "green", borderColor: "darkgreen"}}>Load data from database</button>
           <label for="load-data">Not finished</label>

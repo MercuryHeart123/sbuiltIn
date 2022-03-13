@@ -97,8 +97,6 @@ app.post("/logout", checkAuth, (req, res) => {
 
 app.get("/edit", async (req,res) => {
     var path = `mongodb://${process.env.DB_IP}:${process.env.DB_PORT}/sbuiltin`;
-    // const { title, image64 } = req.body;
-    // let query = { title, image64 };
     const client = new MongoClient(path);
     await client.connect();
     const database = client.db("sbuiltin");
@@ -110,7 +108,7 @@ app.get("/edit", async (req,res) => {
         let info2 = await catalog.find();
         // res.status(200).json(dir);
         // await info2.forEach(console.dir);
-        // console.log("Hello from get edit");
+        console.log("Hello from get edit");
     } catch (error) {
         res.status(404).json({ message: error.message });
 
@@ -126,7 +124,7 @@ app.post("/edit", async (req, res) => {
     if(chkmodel == true) {
         var model = {
             title : text,
-            image64 : base64,
+            image : base64,
             isModel: chkmodel
         }
         const client = new MongoClient(path);
@@ -154,7 +152,7 @@ app.post("/edit", async (req, res) => {
     else {
         var cat = {
             title : text,
-            image64 : base64
+            image : base64
         }
         const client = new MongoClient(path);
         await client.connect();
