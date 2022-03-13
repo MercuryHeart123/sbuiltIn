@@ -3,6 +3,7 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
+  useLocation
 } from "react-router-dom";
 import Footer from './components/footer/footer';
 import Navbar from './components/navbar/navbar';
@@ -14,7 +15,6 @@ import ScrollToTop from './scrolltop'
 import Login from './pages/Authentication/login';
 import axios from "axios";
 import { connect } from "react-redux";
-
 import Edit from './pages/Authentication/edit';
 import { PrivateRoute } from './pages/Authentication/private';
 

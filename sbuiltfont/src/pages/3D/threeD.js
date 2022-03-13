@@ -9,7 +9,8 @@ import Wall from './wall'
 import * as fi from 'react-icons/fi'
 import * as ri from 'react-icons/ri'
 import { v4 as uuidv4 } from 'uuid';
-
+import useWindowDimensions from './useWindowDimensions '
+import { Link } from 'react-router-dom';
 
 
 
@@ -53,7 +54,7 @@ const ThreeD = () => {
     }
 
     const CreateMenuModel = ({ dummyModel }) => {
-
+        const { height, width } = useWindowDimensions()
         return dummyModel.map((item, index) => {
             return <img
 
@@ -69,9 +70,10 @@ const ThreeD = () => {
                 }}
 
                 onDragEnd={(ev) => {
+
                     const clickMouse = new THREE.Vector2();
-                    clickMouse.x = (ev.clientX / window.innerWidth) * 2 - 1;
-                    clickMouse.y = -(ev.clientY / window.innerHeight) * 2 + 1;
+                    clickMouse.x = (ev.clientX / width) * 2 - 1;
+                    clickMouse.y = -(ev.clientY / height) * 2 + 1;
                     let found = intersect(clickMouse, currentCamera, currentScene)
                     console.log(found, currentScene);
                     if (found.length > 0) {
@@ -79,6 +81,7 @@ const ThreeD = () => {
                             if (!found[i].object.userData.ground)
                                 continue
                             let target = found[i].point;
+                            console.log(target);
                             item.modelUuid = uuidv4()
                             item.create = true
                             item.startPosition = target
@@ -223,57 +226,71 @@ const ThreeD = () => {
     const createWall = [0, 0, 0, 0].map((item, index) => {
         return <Wall angle={angle} dimension={planeD} face={index} />
     })
+
     return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'row-reverse',
-            fontFamily: 'Prompt',
-        }}>
-            {/* <button style={{ position: "fixed", zIndex: '10' }} onClick={
+        <div>
+            <Link to='/' style={{
+                margin: '10px',
+                padding: '10px',
+                position: 'absolute',
+                zIndex: '11',
+                fontFamily: 'Prompt',
+                textDecoration: 'none',
+                color: 'black'
+            }}>
+                BACK
+            </Link>
+            <div style={{
+                display: 'flex',
+                flexDirection: 'row-reverse',
+                fontFamily: 'Prompt',
+            }}>
+                {/* <button style={{ position: "fixed", zIndex: '10' }} onClick={
                 () => {
                     setActiveWall(!activeWall)
                     setLookAt([0, 0, 0])
                 }
             }>Wall</button> */}
-            {!showMenu && <fi.FiMenu style={{
-                display: 'flex',
-                flexDirection: 'column',
-                position: "fixed",
-                zIndex: '11',
-                margin: '10px',
-                minWidth: '5vw',
-                minHeight: '5vh',
-                padding: '10px',
-            }} onClick={() => {
-                setShowMenu(true)
-            }} />}
-            {showMenu && <CreateMenu />}
-            <Suspense fallback={null} style={{ display: 'block' }}>
-                <div
-                    onDragOver={(ev) => {
-                        ev.preventDefault();
-                        // Set the dropEffect to move
-                        ev.dataTransfer.dropEffect = "copy"
-                    }}
-                >
-                    <Canvas style={{ zIndex: '0' }}>
-                        <Control
-                            setAngle={setAngle}
-                            type={isDrag}
-                            lookAt={lookAt}
-                            setCurrentCamera={setCurrentCamera}
-                            setCurrentScene={setCurrentScene}
-                        />
-                        <ambientLight />
-                        <Plane dimension={planeD} />
-                        <spotLight position={[0, 5, 10]} />
-                        {allModel && createAllModel()}
-                        {activeWall && createWall}
+                {!showMenu && <fi.FiMenu style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: "fixed",
+                    zIndex: '11',
+                    margin: '10px',
+                    minWidth: '5vw',
+                    minHeight: '5vh',
+                    padding: '10px',
+                }} onClick={() => {
+                    setShowMenu(true)
+                }} />}
+                {showMenu && <CreateMenu />}
+                <Suspense fallback={null} style={{ display: 'block' }}>
+                    <div
+                        onDragOver={(ev) => {
+                            ev.preventDefault();
+                            // Set the dropEffect to move
+                            ev.dataTransfer.dropEffect = "copy"
+                        }}
+                    >
+                        <Canvas style={{ zIndex: '0' }}>
+                            <Control
+                                setAngle={setAngle}
+                                type={isDrag}
+                                lookAt={lookAt}
+                                setCurrentCamera={setCurrentCamera}
+                                setCurrentScene={setCurrentScene}
+                            />
+                            <ambientLight />
+                            <Plane dimension={planeD} />
+                            <spotLight position={[0, 5, 10]} />
+                            {allModel && createAllModel()}
+                            {activeWall && createWall}
 
-                    </Canvas>
-                </div>
-            </Suspense>
-        </div>
+                        </Canvas>
+                    </div>
+                </Suspense>
+            </div>
+        </div >
 
     )
 }
