@@ -1,8 +1,8 @@
 import styled from 'styled-components'
 import { Container } from '../../globalstyle'
 import { TiAnchorOutline } from "react-icons/ti"
-import {Link} from 'react-router-dom';
-import { AiTwotoneHome} from 'react-icons/ai'
+import { Link } from 'react-router-dom';
+import { AiTwotoneHome } from 'react-icons/ai'
 
 
 
@@ -72,7 +72,7 @@ width:100%;
 height:90vh;
 position:absolute;
 top:80px; //top 80 px เพราะต้องเว้นระยะจาก nav ด้านบน 
-left: ${({click}) => (click ? 0 : '-100%')};
+left: ${({ click }) => (click ? 0 : '-100%')};
 opacity:1;
 transition:0.3s;
 background:#ffff;
@@ -81,7 +81,7 @@ padding:5px;
 `
 
 
-export const  NavItem = styled.li` //li ครอบ a 
+export const NavItem = styled.li` //li ครอบ a 
 height:80px;
 border-bottom:2px solid transparent;
 margin-right:5px;
@@ -115,17 +115,17 @@ height:100%;
 
 export const Button = styled.button` //Button 
 border-radius: 18px;
-background:${({primary}) => (primary ? '#4B59F7' : '#0467FB')};
+background:${({ primary }) => (primary ? '#4B59F7' : '#0467FB')};
 white-space:nowrap;
-padding:${({Big}) => Big ? '12px 64px' : '8px 20px' };
+padding:${({ Big }) => Big ? '12px 64px' : '8px 20px'};
 color:#fff;
-font-size:${({fontBig}) => fontBig ? '20px' : '16px'};
+font-size:${({ fontBig }) => fontBig ? '20px' : '16px'};
 cursor:pointer;
 outline:none;
 border:none;
 &:hover{
     transition:0.3s;
-    background:${({primary}) => (primary ? '#0467FB' : '#4B59F7')};
+    background:${({ primary }) => (primary ? '#0467FB' : '#4B59F7')};
 }
 @media screen and (max-width:960px){
     width:100%;

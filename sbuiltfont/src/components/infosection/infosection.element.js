@@ -15,7 +15,7 @@ padding: 20px;
 background:'blue';
 `
 
-export const InfoRow  = styled.div`  //แนวนอน 
+export const InfoRow = styled.div`  //แนวนอน 
 display:flex;
 margin: 0 -15px -15px -15px;
 flex-wrap:wrap;
@@ -47,7 +47,7 @@ padding-bottom:60px;
 `
 
 export const Topline = styled.div`
-color:${({lightTopLine}) => lightTopLine ? '#a9b3c1' : '#1c2237'};
+color:${({ lightTopLine }) => lightTopLine ? '#a9b3c1' : '#1c2237'};
 font-size:18px;
 line-height:48px;
 letter-spacing:1.4px;
@@ -58,20 +58,20 @@ export const Heading = styled.h1`
 margin-bottom:24px;
 font-size:48px;
 line-height:1.1;
-color:${({lightText}) => (lightText ? '#f7f8fa' : '#1c2237')};
+color:${({ lightText }) => (lightText ? '#f7f8fa' : '#1c2237')};
 `
 
 export const Subtitle = styled.p`
-color:${({lightTextDesc}) => lightTextDesc ? '#a9b3c1' : '#1c2237'};
+color:${({ lightTextDesc }) => lightTextDesc ? '#a9b3c1' : '#1c2237'};
 font-size:18px;
 line-height:24px;
 max-width:440px;
 margin-bottom:35px;
 `
 
-export const  ImageWrapper = styled.div`
+export const ImageWrapper = styled.div`
 max-width:550px;
-justify-content:${({start}) => (start ? 'flex-start' : 'flex-end')} ;
+justify-content:${({ start }) => (start ? 'flex-start' : 'flex-end')} ;
 `
 
 export const Img = styled.img`

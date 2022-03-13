@@ -32,6 +32,7 @@
     "three-stdlib": "^2.8.4",
     "three.js": "^0.77.0",
     "troika-three-text": "^0.45.0",
+    "uuid": "^8.3.2",
     "web-vitals": "^2.1.0"
   },
   "scripts": {
