@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const { MongoClient } = require("mongodb");
+const { request } = require("express");
 
 const uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}:${process.env.DB_PORT}`;
 
@@ -92,6 +93,91 @@ app.post("/logout", checkAuth, (req, res) => {
         res.clearCookie(process.env.SESSION_NAME);
         res.end();
     });
+});
+
+app.get("/edit", async (req,res) => {
+    var path = `mongodb://${process.env.DB_IP}:${process.env.DB_PORT}/sbuiltin`;
+    // const { title, image64 } = req.body;
+    // let query = { title, image64 };
+    const client = new MongoClient(path);
+    await client.connect();
+    const database = client.db("sbuiltin");
+    const catalog = database.collection("catalog");
+    const model = database.collection("model");
+    try {
+        //Not finished
+        let info = await model.find();
+        let info2 = await catalog.find();
+        // res.status(200).json(dir);
+        // await info2.forEach(console.dir);
+        // console.log("Hello from get edit");
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+
+    }
+}) 
+
+app.post("/edit", async (req, res) => {
+    var path = `mongodb://${process.env.DB_IP}:${process.env.DB_PORT}/sbuiltin`;
+    var text = req.body.title;
+    var base64 = req.body.image;
+    var chkmodel = req.body.model;
+    console.log(chkmodel)
+    if(chkmodel == true) {
+        var model = {
+            title : text,
+            image64 : base64,
+            isModel: chkmodel
+        }
+        const client = new MongoClient(path);
+        await client.connect();
+        let info = await client.db("sbuiltin").collection("model").insertOne(model);
+        if(info) {
+            console.log("Data inserted");
+            let JSONdata = JSON.stringify({
+                status: "Completed",
+                msg: "Upload completed!",
+            });
+            client.close();
+            res.status(200).end(JSONdata);
+        }
+        else {
+            console.log("Error");
+            let JSONdata = JSON.stringify({
+                status: "๊Failed",
+                msg: "Error! Cannot connect to database.",
+            });
+            client.close();
+            res.status(401).end(JSONdata);
+        }
+    }
+    else {
+        var cat = {
+            title : text,
+            image64 : base64
+        }
+        const client = new MongoClient(path);
+        await client.connect();
+        let info = await client.db("sbuiltin").collection("catalog").insertOne(cat);
+        if(info) {
+            console.log("Data inserted");
+            let JSONdata = JSON.stringify({
+                status: "Completed",
+                msg: "Upload completed!",
+            });
+            client.close();
+            res.status(200).end(JSONdata);
+        }
+        else {
+            console.log("Error");
+            let JSONdata = JSON.stringify({
+                status: "๊Failed",
+                msg: "Error! Cannot connect to database.",
+            });
+            client.close();
+            res.status(401).end(JSONdata);
+        }
+    }
 });
 
 app.listen(port, () => {
