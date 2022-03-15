@@ -4,18 +4,19 @@ import * as THREE from "three"
 import { useThree, useFrame, extend } from 'react-three-fiber'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { useHelper } from "@react-three/drei";
 import { useSpring, a } from '@react-spring/three'
 import { Text } from "troika-three-text";
 import Line from "./line"
+import Inside from './inside'
 
 
 extend({ Text });
-const ImportModel = ({ startPosition, modelUuid, modelPath, modelName, dimension, setIsDrag, plane, setObj, currentObj, setLookAt, objGroup, setObjGroup }) => {
+const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName, dimension, setIsDrag, plane, setObj, currentObj, setLookAt, objGroup, setObjGroup }) => {
     const dragObjectRef = useRef();
     const [pos, setPos] = useState([0, 0, 0]);
-    const [pastActive, setPastActive] = useState(false);
     const [turn, setTurn] = useState(0)
+    const [lock, setLock] = useState(false)
+    const [canMove, setCanMove] = useState(true)
     const [objUuid, setObjUuid] = useState()
     const [opts, setOpts] = useState({
         // font: "Philosopher",
@@ -28,7 +29,6 @@ const ImportModel = ({ startPosition, modelUuid, modelPath, modelName, dimension
         materialType: "MeshPhongMaterial"
     });
     const [firstCome, setFirstCome] = useState(true)
-    const [lock, setLock] = useState(false)
     const [model, setModel] = useState(null)
     const [modelSize, setModelSize] = useState({ x: 0, y: 0, z: 0 })
     const [savePos, setSavePos] = useState([0, 1, 0])
@@ -321,8 +321,9 @@ const ImportModel = ({ startPosition, modelUuid, modelPath, modelName, dimension
     const bind = useDrag(
         ({ active, movement: [x, y], timeStamp, event }) => {
 
-            if (active && !pastActive && !lock) {
+            if (active && !lock && canMove) {
                 setObj(modelUuid)
+
                 event.ray.intersectPlane(plane, planeIntersectPoint);
                 if (isInPlane(planeIntersectPoint) || firstCome
                 ) {
@@ -368,7 +369,7 @@ const ImportModel = ({ startPosition, modelUuid, modelPath, modelName, dimension
 
 
             return timeStamp;
-        },
+        }, { delay: 250 }
     );
 
 
@@ -380,20 +381,21 @@ const ImportModel = ({ startPosition, modelUuid, modelPath, modelName, dimension
         <>
             <a.mesh
 
-                // onClick={(e) => {
+                onClick={(e) => {
+                    setObj(modelUuid)
 
-                //     if (e.altKey) {
-                //         setTurn(turn + Math.PI / 2)
-                //         setModelSize({
-                //             x: modelSize.z,
-                //             y: pos[1],
-                //             z: modelSize.x
-                //         })
-                //     }
-                //     else if (e.ctrlKey) {
-                //         setLock(!lock)
-                //     }
-                // }}
+                    // if (e.altKey) {
+                    //     setTurn(turn + Math.PI / 2)
+                    //     setModelSize({
+                    //         x: modelSize.z,
+                    //         y: pos[1],
+                    //         z: modelSize.x
+                    //     })
+                    // }
+                    // else if (e.ctrlKey) {
+                    //     setLock(!lock)
+                    // }
+                }}
                 userData={{ name: objUuid }}
 
                 castShadow>
@@ -406,7 +408,20 @@ const ImportModel = ({ startPosition, modelUuid, modelPath, modelName, dimension
                     opacity={0}
                     {...spring} {...bind()}
                 >
-
+                    {customize && customize.map((item, index) => {
+                        if (!item.create) {
+                            return null
+                        }
+                        let position = item.startPosition
+                        return <Inside
+                            setCanMove={setCanMove}
+                            startPosition={position}
+                            modelPath={item.modelPath}
+                            parentModelSize={modelSize}
+                            currentObj={currentObj}
+                            key={index}
+                        />
+                    })}
                 </primitive>
 
 
