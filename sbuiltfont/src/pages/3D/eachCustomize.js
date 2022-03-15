@@ -9,20 +9,15 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
         title: 'ลิ้นชักชั้นเดียว1ชั้น',
         modelName: 'ลิ้นชักชั้นเดียว1ชั้น',
         modelPath: 'model/inside/ลิ้นชักชั้นเดียว1ชั้น.gltf',
-        previewPath: 'https://cdn.pixabay.com/photo/2017/01/14/12/59/iceland-1979445_960_720.jpg'
+        previewPath: 'model/drawer.png'
     },
     {
         title: 'ชั้นปรับระดับ',
         modelName: 'ชั้นปรับระดับ',
         modelPath: 'model/inside/ชั้นปรับระดับ.gltf',
-        previewPath: 'https://cdn.pixabay.com/photo/2019/06/12/15/07/cat-4269479_960_720.jpg'
+        previewPath: 'model/floor.png'
     },
-    {
-        title: 'ราว',
-        modelName: 'ราว',
-        modelPath: 'model/inside/ราว.gltf',
-        previewPath: 'https://cdn.pixabay.com/photo/2016/12/04/21/58/rabbit-1882699_960_720.jpg'
-    },
+
     ]
     const CreateMenuModel = ({ dummyModel }) => {
         const { height, width } = useWindowDimensions()
@@ -72,7 +67,7 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
 
                 }}
                 src={item.previewPath}
-                style={{ maxHeight: '6vw', maxWidth: '6vw', padding: '5px' }}
+                style={{ maxHeight: '10vw', maxWidth: '10vw', padding: '5px' }}
             />
         })
     }
