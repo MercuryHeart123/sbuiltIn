@@ -109,7 +109,7 @@ app.get("/edit", async (req, res) => {
         let info2 = await catalog.find();
         // res.status(200).json(dir);
         // await info2.forEach(console.dir);
-        // console.log("Hello from get edit");
+        console.log("Hello from get edit");
     } catch (error) {
         res.status(404).json({ message: error.message });
 
