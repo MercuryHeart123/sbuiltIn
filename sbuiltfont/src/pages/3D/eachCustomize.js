@@ -185,8 +185,8 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
 
                     {thisCustom && thisCustom.map((item, index) => {
                         return (<>
-                            {item.create && <div key={index}>
-                                <span>
+                            {item.create && <div key={index} >
+                                <span style={{borderBottom:'1px solid #CECECE',width:'100%',display:'flex',borderRadius:'7px',paddingLeft:'15px',marginBottom:'2px'}}>
                                     {item.title}
                                 </span>
                             </div>}

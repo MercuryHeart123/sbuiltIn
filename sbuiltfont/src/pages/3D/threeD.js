@@ -90,7 +90,7 @@ const ThreeD = () => {
                 margin: '10px',
                 padding: '10px',
                 position: 'absolute',
-                zIndex: '11',
+                zIndex: '500',
                 fontFamily: 'Prompt',
                 textDecoration: 'none',
                 color: 'black'

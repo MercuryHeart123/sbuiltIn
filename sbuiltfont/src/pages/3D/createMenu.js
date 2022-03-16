@@ -149,7 +149,7 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
                 <div className='ItemList'>
                     {allModel && allModel.map((item, index) => {
                         return (<>
-                            {item.create && <div>
+                            {item.create && <div style={{borderBottom:'1px solid #CECECE',width:'100%',borderRadius:'7px',paddingLeft:'15px',marginBottom:'2px'}}>
                                 <span style={{ display: 'flex', justifyContent: 'space-between' }}>
 
                                     <span>
