@@ -5,7 +5,7 @@ import '../../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 const Edit = () => {
 
-  const [item, setItem] = useState({ title: '', image: '', model: false });
+  const [item, setItem] = useState({ name: '', detail: '', price: '', image: '', model: false});
   const [items, setItems] = useState([])
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -28,21 +28,33 @@ const Edit = () => {
       style={{
         paddingBottom: "20vh",
         paddingTop: "9vh",
-        width: "30vw",
+        width: "20vw",
         margin: "0 auto",
         textAlign: "left",
       }}>
       <h4>Add data to catalog or add an model (เพิ่มข้อมูลไปยังแคตตาล้อกหรือเพิ่มโมเดล)</h4>
       {/* <pre>{JSON.stringify(item, null, '\t')}</pre> */}
       <form action="" onSubmit={onSubmitHandler}>
-        <label for="text">&nbsp; Please provide a description for image or model</label>
+        <label for="name">&nbsp; Name</label>
         <br />
-        <input type="text" id="text" className="input-field" style={{ borderColor: "black", borderRadius: "5px" }}
+        <input type="text" id="name" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }}
 
-          onChange={e => setItem({ ...item, title: e.target.value })}
+          onChange={e => setItem({ ...item, name: e.target.value })}
         />
         <br />
+        <label for="detail">&nbsp; Enter detail</label>
         <br />
+        <input type="text" id="detail" className="form-control" placeholder="Enter detail" style={{ borderColor: "black", borderRadius: "5px" }}
+
+          onChange={e => setItem({ ...item, detail: e.target.value })}
+        />
+        <br />
+        <label for="price">&nbsp; Enter price</label>
+        <br />
+        <input type="text" id="price" className="form-control" placeholder="Enter price" style={{ borderColor: "black", borderRadius: "5px" }}
+
+          onChange={e => setItem({ ...item, price: e.target.value })}
+        />
         <FileBase64
           type="file"
           id="image"

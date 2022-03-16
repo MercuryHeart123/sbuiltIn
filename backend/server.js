@@ -3,11 +3,12 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const fs = require("fs");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const { MongoClient } = require("mongodb");
-const { request } = require("express");
+const { v4: uuidv4 } = require("uuid");
 
 const uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}:${process.env.DB_PORT}`;
 
@@ -117,14 +118,20 @@ app.get("/edit", async (req, res) => {
 })
 
 app.post("/edit", async (req, res) => {
-    var text = req.body.title;
-    var base64 = req.body.image;
+    var name = req.body.name;
+    var detail = req.body.detail;
+    var price = req.body.price;
     var chkmodel = req.body.model;
+    var img64 = req.body.image;
+    const img = { img64 }
+    // const { uid } = req.body;
+
     console.log(chkmodel)
     if (chkmodel == true) {
         var model = {
-            title: text,
-            image64: base64,
+            title: name,
+            about: detail,
+            price: price, 
             isModel: chkmodel
         }
         const client = new MongoClient(uri);
@@ -150,10 +157,43 @@ app.post("/edit", async (req, res) => {
         }
     }
     else {
+        let path = [];
+        let rootPath = './image';
+        fs.rmSync(rootPath, { recursive: true });
+        fs.mkdirSync(rootPath, { recursive: true });
+        let imgUid = uuidv4();
+            // let base64Image = img[i].split(";base64,").pop();
+            let imgPath = rootPath + `/${imgUid}.jpg`;
+            path.push(imgPath);
+            fs.writeFile(
+              imgPath,
+              img64,
+            //   { encoding: "base64" },
+              function (err) {
+                console.log(`jpg created`);
+              }
+            );
+        // for (let i = 0; i < img.length; i++) {
+        //     let imgUid = uuidv4();
+        //     // let base64Image = img[i].split(";base64,").pop();
+        //     let imgPath = rootPath + `/${imgUid}.jpg`;
+        //     path.push(imgPath);
+        //     fs.writeFile(
+        //       imgPath,
+        //       img64,
+        //     //   { encoding: "base64" },
+        //       function (err) {
+        //         console.log(`jpg created`);
+        //       }
+        //     );
+        //   }
         var cat = {
-            title: text,
-            image64: base64
+            title: name,
+            about: detail,
+            price: price,
+            pathimg: imgPath
         }
+        console.log(imgPath);
         const client = new MongoClient(uri);
         await client.connect();
         let info = await client.db("sbuiltin").collection("catalog").insertOne(cat);
