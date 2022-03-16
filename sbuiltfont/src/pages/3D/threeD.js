@@ -142,7 +142,7 @@ const ThreeD = () => {
                     currentScene={currentScene}
                 />}
                 <Suspense fallback={null} style={{ display: 'block' }}>
-                    <div
+                    <div style={{width:'100vw'}}
                         onDragOver={(ev) => {
                             ev.preventDefault();
                             // Set the dropEffect to move

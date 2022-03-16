@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import FileBase64 from 'react-file-base64';
 import { createItem, getItems } from './editfunction.js';
-import '../../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+// import '../../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 const Edit = () => {
 
