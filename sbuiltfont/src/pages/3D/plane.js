@@ -10,8 +10,8 @@ const Plane = ({ dimension }) => {
             position={[0, dimension.y / (-2), 0]}
             scale={[dimension.x, dimension.y, dimension.z]}
             userData={{ ground: true }}
-            castShadow
-            receiveShadow >
+
+        >
             <boxBufferGeometry
                 attach="geometry"
 

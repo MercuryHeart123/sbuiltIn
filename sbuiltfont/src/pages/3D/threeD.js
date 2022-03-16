@@ -44,6 +44,12 @@ const ThreeD = () => {
         modelPath: 'model/100cm.gltf',
         previewPath: 'https://cdn.pixabay.com/photo/2016/12/04/21/58/rabbit-1882699_960_720.jpg'
     },
+    {
+        title: '100x240',
+        modelName: '100cm',
+        modelPath: 'model/100cm.gltf',
+        previewPath: 'https://cdn.pixabay.com/photo/2016/12/04/21/58/rabbit-1882699_960_720.jpg'
+    },
     ]
 
 
@@ -54,6 +60,7 @@ const ThreeD = () => {
                     modelUuid={`${item.modelUuid}`}
                     modelPath={`${item.modelPath}`}
                     modelName={`${item.modelName}`}
+                    setAllModel={setAllModel}
                     customize={item.customize}
                     startPosition={item.startPosition}
                     dimension={planeD}
@@ -140,7 +147,10 @@ const ThreeD = () => {
                             ev.dataTransfer.dropEffect = "copy"
                         }}
                     >
-                        <Canvas style={{ zIndex: '0' }}>
+                        <Canvas
+                            colorManagement
+                            shadowMap
+                            style={{ zIndex: '0' }}>
                             <Control
                                 setAngle={setAngle}
                                 type={isDrag}
@@ -148,7 +158,13 @@ const ThreeD = () => {
                                 setCurrentCamera={setCurrentCamera}
                                 setCurrentScene={setCurrentScene}
                             />
-                            <ambientLight />
+                            <ambientLight intensity={0.2} />
+                            {/* <directionalLight
+                                intensity={1}
+                                castShadow
+                                shadow-mapSize-height={512}
+                                shadow-mapSize-width={512}
+                            /> */}
                             <Plane dimension={planeD} />
                             <spotLight position={[0, 5, 10]} />
                             {allModel && createAllModel()}

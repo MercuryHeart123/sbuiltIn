@@ -20,6 +20,7 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
         for (let i = 0; i < objGroup.length; i++) {
             let finding = objGroup[i]
             let index = finding.indexOf(uuid)
+
             if (index > -1) {
                 return {
                     parentIndex: i,
@@ -38,7 +39,11 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
     const CreateMenuModel = ({ dummyModel }) => {
         const { height, width } = useWindowDimensions()
         return dummyModel.map((item, index) => {
-            return <img
+            let container = []
+            if (index % 2 == 0 && index != 0) {
+                container.push(<br />)
+            }
+            container.push(<img
 
                 draggable={true}
                 onDragStart={(ev) => {
@@ -65,6 +70,7 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
                             item.modelUuid = uuidv4()
                             item.create = true
                             item.startPosition = target
+                            item.showDetail = true
                             item.customize = []
                             if (!allModel) {
                                 setAllModel([item])
@@ -77,8 +83,10 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
 
                 }}
                 src={item.previewPath}
-                style={{ maxHeight: '6vw', maxWidth: '6vw', padding: '5px' }}
-            />
+                style={{ maxHeight: '10vw', maxWidth: '10vw', padding: '5px' }}
+
+            />)
+            return container
         })
     }
 
@@ -91,7 +99,7 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
             margin: '20px',
             background: '#F1EDED',
             minWidth: '20vw',
-            minHeight: '60vh',
+            minHeight: '80vh',
             border: '1px solid #DCDCDC',
             borderRadius: '18px',
             padding: '10px',
@@ -130,27 +138,50 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
                 <div className='ItemList'>
                     {allModel && allModel.map((item, index) => {
                         return (<>
-                            {item.create && <div onClick={() => {
-                                allModel[index].create = false
-                                let removeIndex = searchByUuid(item.modelUuid)
-                                if (checkIsIsolate(removeIndex)) {
-                                    objGroup.splice(removeIndex.parentIndex, 1)
-                                }
-                                else {
-                                    objGroup[removeIndex.parentIndex].splice(removeIndex.selfIndex, 1)
-                                }
-                                setObjGroup([...objGroup])
-                                setAllModel([...allModel])
-                            }} >
-                                <span>
-                                    {item.modelName}
-                                    <div style={{ paddingLeft: '20px' }}>
-                                        {item.customize.map((item, index) => {
-                                            return <div key={index}>- {item.title}</div>
-                                        })}
-                                    </div>
+                            {item.create && <div>
+                                <span style={{ display: 'flex', justifyContent: 'space-between' }}>
+
+                                    <span>
+                                        {item.modelName}
+                                    </span>
+                                    <span>
+                                        {item.showDetail ?
+                                            <ri.RiArrowDownSLine style={{ marginRight: '20px' }}
+                                                onClick={() => {
+                                                    allModel[index].showDetail = false
+                                                    setAllModel([...allModel])
+                                                }}
+                                            />
+                                            : <ri.RiArrowDownSFill style={{ marginRight: '20px' }}
+                                                onClick={() => {
+                                                    allModel[index].showDetail = true
+                                                    setAllModel([...allModel])
+
+                                                }}
+                                            />}
+
+                                        <ri.RiCloseFill
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => {
+                                                allModel[index].create = false
+                                                let removeIndex = searchByUuid(item.modelUuid)
+                                                if (checkIsIsolate(removeIndex)) {
+                                                    objGroup.splice(removeIndex.parentIndex, 1)
+                                                }
+                                                else {
+                                                    objGroup[removeIndex.parentIndex].splice(removeIndex.selfIndex, 1)
+                                                }
+                                                setObjGroup([...objGroup])
+                                                setAllModel([...allModel])
+                                            }} />
+                                    </span>
 
                                 </span>
+                                {item.showDetail && <div style={{ paddingLeft: '20px' }}>
+                                    {item.customize.map((item, index) => {
+                                        return <div key={index}>- {item.title}</div>
+                                    })}
+                                </div>}
                             </div>}
 
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import * as ri from 'react-icons/ri'
 import useWindowDimensions from './useWindowDimensions '
 import * as THREE from "three"
+import { v4 as uuidv4 } from 'uuid';
 
 const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, currentCamera, currentScene }) => {
     const [thisCustom, setThisCustom] = useState()
@@ -17,6 +18,30 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
         modelPath: 'model/inside/ชั้นปรับระดับ.gltf',
         previewPath: 'model/floor.png'
     },
+    {
+        title: 'ราว',
+        modelName: 'ราว',
+        modelPath: 'model/inside/ราว.gltf',
+        previewPath: 'model/drawer.png'
+    },
+    {
+        title: 'ราว',
+        modelName: 'ราว',
+        modelPath: 'model/inside/ราว.gltf',
+        previewPath: 'model/drawer.png'
+    },
+    {
+        title: 'ราว',
+        modelName: 'ราว',
+        modelPath: 'model/inside/ราว.gltf',
+        previewPath: 'model/drawer.png'
+    },
+    {
+        title: 'ราว',
+        modelName: 'ราว',
+        modelPath: 'model/inside/ราว.gltf',
+        previewPath: 'model/drawer.png'
+    },
 
     ]
     const CreateMenuModel = ({ dummyModel }) => {
@@ -29,7 +54,11 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
         }
 
         return dummyModel.map((item, index) => {
-            return <img
+            let container = []
+            if (index % 2 == 0 && index != 0) {
+                container.push(<br />)
+            }
+            container.push(<img
                 key={index}
                 draggable={true}
                 onDragStart={(ev) => {
@@ -54,6 +83,7 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
                             }
                             let target = found[i].point;
                             item.startPosition = target
+                            item.modelUuid = uuidv4()
                             item.create = true
                             if (!thisCustom) {
                                 setThisCustom([item])
@@ -68,7 +98,8 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
                 }}
                 src={item.previewPath}
                 style={{ maxHeight: '10vw', maxWidth: '10vw', padding: '5px' }}
-            />
+            />)
+            return container
         })
     }
 
@@ -91,9 +122,10 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
                 continue
             }
 
-            if (currentObj == allModel[i].modelUuid) {
+            if (thisCustom && currentObj == allModel[i].modelUuid) {
                 allModel[i].customize = thisCustom
                 setAllModel([...allModel])
+                break
             }
         }
     }, [thisCustom])
@@ -107,7 +139,7 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
             margin: '20px',
             background: '#F1EDED',
             minWidth: '20vw',
-            minHeight: '60vh',
+            minHeight: '80vh',
             border: '1px solid #DCDCDC',
             borderRadius: '18px',
             padding: '10px',

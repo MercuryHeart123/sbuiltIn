@@ -11,7 +11,7 @@ import Inside from './inside'
 
 
 extend({ Text });
-const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName, dimension, setIsDrag, plane, setObj, currentObj, setLookAt, objGroup, setObjGroup }) => {
+const ImportModel = ({ allModel, setAllModel, customize, startPosition, modelUuid, modelPath, modelName, dimension, setIsDrag, plane, setObj, currentObj, setLookAt, objGroup, setObjGroup }) => {
     const dragObjectRef = useRef();
     const [pos, setPos] = useState([0, 0, 0]);
     const [turn, setTurn] = useState(0)
@@ -19,7 +19,7 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
     const [canMove, setCanMove] = useState(true)
     const [objUuid, setObjUuid] = useState()
     const [opts, setOpts] = useState({
-        // font: "Philosopher",
+        // font: "Prompt",
         fontSize: 0.1,
         color: "#000000",
         maxWidth: 100,
@@ -322,7 +322,9 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
         ({ active, movement: [x, y], timeStamp, event }) => {
 
             if (active && !lock && canMove) {
-                setObj(modelUuid)
+                if (currentObj !== modelUuid) {
+                    setObj(modelUuid)
+                }
 
                 event.ray.intersectPlane(plane, planeIntersectPoint);
                 if (isInPlane(planeIntersectPoint) || firstCome
@@ -382,7 +384,9 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
             <a.mesh
 
                 onClick={(e) => {
-                    setObj(modelUuid)
+                    if (currentObj !== modelUuid) {
+                        setObj(modelUuid)
+                    }
 
                     // if (e.altKey) {
                     //     setTurn(turn + Math.PI / 2)
@@ -398,7 +402,7 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
                 }}
                 userData={{ name: objUuid }}
 
-                castShadow>
+                castShadow receiveShadow>
                 <primitive
                     position={pos}
                     rotation={[0, turn, 0]}
@@ -409,16 +413,22 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
                     {...spring} {...bind()}
                 >
                     {customize && customize.map((item, index) => {
+
                         if (!item.create) {
                             return null
                         }
-                        let position = item.startPosition
+
+
                         return <Inside
                             setCanMove={setCanMove}
-                            startPosition={position}
+                            parentUuid={objUuid}
+                            modelUuid={item.modelUuid}
+                            startPosition={item.startPosition}
                             modelPath={item.modelPath}
                             parentModelSize={modelSize}
                             currentObj={currentObj}
+                            setAllModel={setAllModel}
+                            allModel={allModel}
                             key={index}
                         />
                     })}
