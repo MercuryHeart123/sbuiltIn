@@ -30,26 +30,27 @@ const ThreeD = () => {
         title: '50x240',
         modelName: '50cm',
         modelPath: 'model/50cm.gltf',
-        previewPath: 'https://cdn.pixabay.com/photo/2017/01/14/12/59/iceland-1979445_960_720.jpg'
+        previewPath: 'model/wardrobe_0.5m.png'
     },
     {
-        title: '70x24',
+        title: '70x240',
         modelName: '70cm',
         modelPath: 'model/70cm.gltf',
-        previewPath: 'https://cdn.pixabay.com/photo/2019/06/12/15/07/cat-4269479_960_720.jpg'
+        previewPath: 'model/wardrobe_0.75m.png'
     },
     {
         title: '100x240',
         modelName: '100cm',
         modelPath: 'model/100cm.gltf',
-        previewPath: 'https://cdn.pixabay.com/photo/2016/12/04/21/58/rabbit-1882699_960_720.jpg'
+        previewPath: 'model/wardrobe_1m.png'
     },
     {
         title: '100x240',
         modelName: '100cm',
         modelPath: 'model/100cm.gltf',
-        previewPath: 'https://cdn.pixabay.com/photo/2016/12/04/21/58/rabbit-1882699_960_720.jpg'
+        previewPath: 'model/wardrobe_1m.png'
     },
+
     ]
 
 
@@ -116,6 +117,7 @@ const ThreeD = () => {
                     minWidth: '5vw',
                     minHeight: '5vh',
                     padding: '10px',
+                    cursor: 'pointer'
                 }} onClick={() => {
                     setShowMenu(true)
                 }} />}

@@ -5,3 +5,12 @@ canvas{
     margin: 0;
     padding: 0;
 }
+.eachCustom{
+    border: 1px solid transparent;
+    border-radius: 15px;
+}
+.eachCustom:hover{
+    border: 1px solid #CECECE;
+    border-radius: 15px;
+    cursor: pointer;
+}

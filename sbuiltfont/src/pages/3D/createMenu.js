@@ -43,49 +43,59 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
             if (index % 2 == 0 && index != 0) {
                 container.push(<br />)
             }
-            container.push(<img
+            container.push(
+                <div
+                    className='eachCustom'
+                    draggable={true}
+                    style={{ display: 'flex', flexDirection: 'column' }}
+                    onDragStart={(ev) => {
+                        ev.dataTransfer.effectAllowed = "all";
+                    }
+                    }
+                    onDragOver={(ev) => {
+                        ev.preventDefault();
+                        // Set the dropEffect to move
+                        ev.dataTransfer.dropEffect = "copy"
+                    }}
 
-                draggable={true}
-                onDragStart={(ev) => {
-                    ev.dataTransfer.effectAllowed = "all";
-                }
-                }
-                onDragOver={(ev) => {
-                    ev.preventDefault();
-                    // Set the dropEffect to move
-                    ev.dataTransfer.dropEffect = "copy"
-                }}
+                    onDragEnd={(ev) => {
 
-                onDragEnd={(ev) => {
-
-                    const clickMouse = new THREE.Vector2();
-                    clickMouse.x = (ev.clientX / width) * 2 - 1;
-                    clickMouse.y = -(ev.clientY / height) * 2 + 1;
-                    let found = intersect(clickMouse, currentCamera, currentScene)
-                    if (found.length > 0) {
-                        for (let i = 0; i < found.length; i++) {
-                            if (!found[i].object.userData.ground)
-                                continue
-                            let target = found[i].point;
-                            item.modelUuid = uuidv4()
-                            item.create = true
-                            item.startPosition = target
-                            item.showDetail = true
-                            item.customize = []
-                            if (!allModel) {
-                                setAllModel([item])
-                            }
-                            else {
-                                setAllModel([...allModel, item])
+                        const clickMouse = new THREE.Vector2();
+                        clickMouse.x = (ev.clientX / width) * 2 - 1;
+                        clickMouse.y = -(ev.clientY / height) * 2 + 1;
+                        let found = intersect(clickMouse, currentCamera, currentScene)
+                        if (found.length > 0) {
+                            for (let i = 0; i < found.length; i++) {
+                                if (!found[i].object.userData.ground)
+                                    continue
+                                let target = found[i].point;
+                                item.modelUuid = uuidv4()
+                                item.create = true
+                                item.startPosition = target
+                                item.showDetail = true
+                                item.customize = []
+                                if (!allModel) {
+                                    setAllModel([item])
+                                }
+                                else {
+                                    setAllModel([...allModel, item])
+                                }
                             }
                         }
-                    }
 
-                }}
-                src={item.previewPath}
-                style={{ maxHeight: '10vw', maxWidth: '10vw', padding: '5px' }}
+                    }}>
+                    <div>
+                        <img
+                            src={item.previewPath}
+                            style={{ maxHeight: '10vw', maxWidth: '10vw', margin: '2px' }}
+                        />
+                    </div>
+                    <div>
+                        {item.title}
+                    </div>
 
-            />)
+                </div>
+            )
             return container
         })
     }
@@ -98,7 +108,8 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
             zIndex: '10',
             margin: '20px',
             background: '#F1EDED',
-            minWidth: '20vw',
+            minWidth: '25vw',
+            maxWidth: '25vw',
             minHeight: '80vh',
             border: '1px solid #DCDCDC',
             borderRadius: '18px',
@@ -114,7 +125,7 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
                 display: 'flex',
                 flexDirection: 'row-reverse',
             }}>
-                <ri.RiCloseFill onClick={() => {
+                <ri.RiCloseFill style={{ cursor: 'pointer' }} onClick={() => {
                     setShowMenu(false)
                 }} />
             </div>
@@ -126,7 +137,7 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
                 <div className='HeaderTopic'>
                     <h5 style={{ textDecoration: 'underline' }}>โครงตู้:</h5>
                 </div>
-                <div className='ItemList' style={{ textAlign: 'center' }}>
+                <div className='ItemList' style={{ textAlign: 'center', justifyContent: 'center', display: 'flex', flexFlow: 'wrap' }}>
                     {dummyModel && <CreateMenuModel dummyModel={dummyModel} />}
                 </div>
             </div>
@@ -145,20 +156,20 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
                                         {item.modelName}
                                     </span>
                                     <span>
-                                        {item.showDetail ?
-                                            <ri.RiArrowDownSLine style={{ marginRight: '20px' }}
+                                        {item.customize.length > 0 && (item.showDetail ?
+                                            <ri.RiArrowDownSLine style={{ marginRight: '20px', cursor: 'pointer' }}
                                                 onClick={() => {
                                                     allModel[index].showDetail = false
                                                     setAllModel([...allModel])
                                                 }}
                                             />
-                                            : <ri.RiArrowDownSFill style={{ marginRight: '20px' }}
+                                            : <ri.RiArrowDownSFill style={{ marginRight: '20px', cursor: 'pointer' }}
                                                 onClick={() => {
                                                     allModel[index].showDetail = true
                                                     setAllModel([...allModel])
 
                                                 }}
-                                            />}
+                                            />)}
 
                                         <ri.RiCloseFill
                                             style={{ cursor: 'pointer' }}
