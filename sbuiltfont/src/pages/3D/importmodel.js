@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react"
 import { useDrag } from "@use-gesture/react"
 import * as THREE from "three"
-import { useThree, useFrame, extend } from 'react-three-fiber'
+import { useThree, useFrame, extend } from '@react-three/fiber'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { useSpring, a } from '@react-spring/three'

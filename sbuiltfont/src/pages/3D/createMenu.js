@@ -36,6 +36,14 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
         return raycaster.intersectObjects(scene.children);
     }
 
+    const checkCustomCreate = (customize) => {
+        let active = false
+        for (let i = 0; i < customize.length; i++) {
+            active = active || customize[i].create
+        }
+        return active
+    }
+
     const CreateMenuModel = ({ dummyModel }) => {
         const { height, width } = useWindowDimensions()
         return dummyModel.map((item, index) => {
@@ -86,6 +94,7 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
                     }}>
                     <div>
                         <img
+                            draggable={false}
                             src={item.previewPath}
                             style={{ maxHeight: '10vw', maxWidth: '10vw', margin: '2px' }}
                         />
@@ -149,14 +158,14 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
                 <div className='ItemList'>
                     {allModel && allModel.map((item, index) => {
                         return (<>
-                            {item.create && <div style={{borderBottom:'1px solid #CECECE',width:'100%',borderRadius:'7px',paddingLeft:'15px',marginBottom:'2px'}}>
+                            {item.create && <div style={{ borderBottom: '1px solid #CECECE', width: '100%', borderRadius: '7px', paddingLeft: '15px', marginBottom: '2px' }}>
                                 <span style={{ display: 'flex', justifyContent: 'space-between' }}>
 
                                     <span>
                                         {item.modelName}
                                     </span>
                                     <span>
-                                        {item.customize.length > 0 && (item.showDetail ?
+                                        {checkCustomCreate(item.customize) > 0 && (item.showDetail ?
                                             <ri.RiArrowDownSLine style={{ marginRight: '20px', cursor: 'pointer' }}
                                                 onClick={() => {
                                                     allModel[index].showDetail = false
@@ -190,7 +199,11 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
                                 </span>
                                 {item.showDetail && <div style={{ paddingLeft: '20px' }}>
                                     {item.customize.map((item, index) => {
-                                        return <div key={index}>- {item.title}</div>
+                                        return <>
+                                            {item.create && <div key={index}>
+                                                - {item.title}
+                                            </div>}
+                                        </>
                                     })}
                                 </div>}
                             </div>}

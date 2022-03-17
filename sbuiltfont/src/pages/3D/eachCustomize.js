@@ -97,6 +97,7 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
                     }}>
                     <div>
                         <img
+                            draggable={false}
                             key={index}
                             src={item.previewPath}
                             style={{ maxHeight: '10vw', maxWidth: '10vw', margin: '2px' }}
@@ -148,6 +149,7 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
             background: '#F1EDED',
             minWidth: '25vw',
             minHeight: '80vh',
+            maxHeight: '80vh',
             maxWidth: '25vw',
             border: '1px solid #DCDCDC',
             borderRadius: '18px',
@@ -159,10 +161,13 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
                 display: 'flex',
                 flexDirection: 'row-reverse',
             }}>
-                <ri.RiCloseFill onClick={() => {
-                    setObj(false)
-                    setThisCustom([])
-                }} />
+                <ri.RiCloseFill
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                        setObj(false)
+                        setThisCustom([])
+                    }}
+                />
             </div>
             <div style={{ margin: "0 auto", borderBottom: '1px solid black', height: '35px', width: '95%', textAlign: 'center' }}>
                 <h1 style={{ fontSize: '28px', }}>Models</h1>
@@ -185,10 +190,22 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
 
                     {thisCustom && thisCustom.map((item, index) => {
                         return (<>
-                            {item.create && <div key={index} >
-                                <span style={{borderBottom:'1px solid #CECECE',width:'100%',display:'flex',borderRadius:'7px',paddingLeft:'15px',marginBottom:'2px'}}>
-                                    {item.title}
+                            {item.create && <div key={index} style={{ borderBottom: '1px solid #CECECE', width: '100%', borderRadius: '7px', paddingLeft: '15px', marginBottom: '2px' }}>
+                                <span style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <span>
+                                        {item.title}
+                                    </span>
+                                    <span>
+                                        <ri.RiCloseFill
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => {
+                                                thisCustom[index].create = false
+                                                setThisCustom([...thisCustom])
+                                            }}
+                                        />
+                                    </span>
                                 </span>
+
                             </div>}
                         </>)
                     })}

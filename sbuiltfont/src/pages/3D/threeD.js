@@ -1,5 +1,5 @@
 import React, { useState, Suspense } from 'react'
-import { Canvas } from 'react-three-fiber'
+import { Canvas } from '@react-three/fiber'
 import * as THREE from "three"
 import './style.css'
 import Plane from './plane'
@@ -10,7 +10,7 @@ import * as fi from 'react-icons/fi'
 import { Link } from 'react-router-dom';
 import CreateMenu from './createMenu'
 import EachCustomize from './eachCustomize'
-
+import Box from './box'
 
 
 const ThreeD = () => {
@@ -37,6 +37,18 @@ const ThreeD = () => {
         modelName: '70cm',
         modelPath: 'model/70cm.gltf',
         previewPath: 'model/wardrobe_0.75m.png'
+    },
+    {
+        title: '100x240',
+        modelName: '100cm',
+        modelPath: 'model/100cm.gltf',
+        previewPath: 'model/wardrobe_1m.png'
+    },
+    {
+        title: '100x240',
+        modelName: '100cm',
+        modelPath: 'model/100cm.gltf',
+        previewPath: 'model/wardrobe_1m.png'
     },
     {
         title: '100x240',
@@ -93,7 +105,8 @@ const ThreeD = () => {
                 zIndex: '500',
                 fontFamily: 'Prompt',
                 textDecoration: 'none',
-                color: 'black'
+                color: 'black',
+                userSelect: 'none',
             }}>
                 BACK
             </Link>
@@ -142,7 +155,7 @@ const ThreeD = () => {
                     currentScene={currentScene}
                 />}
                 <Suspense fallback={null} style={{ display: 'block' }}>
-                    <div style={{width:'100vw'}}
+                    <div style={{ width: '100vw' }}
                         onDragOver={(ev) => {
                             ev.preventDefault();
                             // Set the dropEffect to move
@@ -169,6 +182,7 @@ const ThreeD = () => {
                             /> */}
                             <Plane dimension={planeD} />
                             <spotLight position={[0, 5, 10]} />
+                            {/* <Box /> */}
                             {allModel && createAllModel()}
                             {activeWall && createWall}
 
