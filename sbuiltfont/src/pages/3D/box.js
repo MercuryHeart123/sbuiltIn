@@ -1,46 +1,37 @@
 import React, { useRef, useState } from "react"
-import { useSpring, a } from '@react-spring/three'
+// import { useSpring, a } from '@react-spring/three'
 import * as THREE from "three"
 import { useHelper } from "@react-three/drei";
+import { useSpring, animated } from '@react-spring/three'
+import { useThree, useFrame, extend } from '@react-three/fiber'
 
 const Box = () => {
-    const meshRef = useRef();
-    const [hovered, setHovered] = useState(false)
-    const [active, setActive] = useState(false)
-    const props = useSpring({
-        // scale: active ? [2, 1.5, 1.5] : [1, 3, 2],
-        color: hovered ? 'red' : 'grey'
+
+    const mesh = useRef()
+
+    useFrame(() => {
+        if (scale.animation.values[0]) {
+            console.log(scale.animation.values[0].lastPosition)
+
+        }
+        mesh.current.rotation.x += 0.01
     })
+    const [hovered, setHover] = useState(false)
+    const [active, setActive] = useState(false)
+    const { scale } = useSpring({ scale: active ? 1.5 : 1 })
 
-
-    // useHelper(meshRef, THREE.BoxHelper, 'blue')
     return (
-        <a.mesh
-            ref={meshRef}
-            onPointerOver={() => {
-                setHovered(true)
-            }}
-            onPointerOut={() => {
-                setHovered(false)
-            }}
-            onClick={() => {
-                setActive(!active)
-            }}
-            // scale={props.scale}
-            castShadow={true}
-            receiveShadow={true}
+        <animated.mesh ref={mesh}
+            onPointerOver={(event) => setHover(true)}
+            onPointerOut={(event) => setHover(false)}
+            onClick={(event) => setActive(!active)}
+            scale={scale}
+            position={[-2.2, 0, 0]}
         >
-            <boxBufferGeometry
-                attach="geometry"
+            <boxGeometry args={[2, 2, 2]} />
+            <meshStandardMaterial color={hovered ? "hotpink" : "orange"} />
 
-            />
-
-            <a.meshPhysicalMaterial
-                attach='material'
-                color={props.color} />
-            {meshRef && <boxHelper args={[meshRef.current, 0xffff00]} />}
-
-        </a.mesh>
+        </animated.mesh>
 
     )
 }

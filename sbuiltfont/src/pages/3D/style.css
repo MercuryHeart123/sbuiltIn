@@ -15,3 +15,30 @@ canvas {
   border-radius: 15px;
   cursor: pointer;
 }
+.ItemList{
+  overflow-y: scroll;
+  overflow-y: overlay;
+  max-height: 35vh;
+}
+.ItemList::-webkit-scrollbar {
+  
+  width: 10px;
+}
+.ItemList::-webkit-scrollbar-track {
+  background: #cecece;
+  border-radius: 10px;
+}
+.ItemList::-webkit-scrollbar-thumb {
+  background: #FF5757;
+  border-radius: 10px;
+}
+
+.ItemList::-webkit-scrollbar-thumb:hover {
+  background: #ff6b48;
+  border-radius: 10px;
+}
+
+.ItemList::-webkit-scrollbar-thumb:active {
+  background: #ff6b48;
+  border-radius: 10px;
+}

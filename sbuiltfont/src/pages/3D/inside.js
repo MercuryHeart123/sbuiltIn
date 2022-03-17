@@ -3,7 +3,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import * as THREE from "three"
 import { useDrag } from "@use-gesture/react"
-import { useThree } from 'react-three-fiber'
+import { useThree } from '@react-three/fiber'
 import useWindowDimensions from "./useWindowDimensions "
 
 const Inside = ({ parentUuid, modelUuid, currentObj, setCanMove, parentModelSize, startPosition, modelPath }) => {
