@@ -61,10 +61,11 @@ export const HambergerIcon = styled.div` //hamberger icon container
 export const NavMenu = styled.ul` //ul ตัวครอบทั้ง li a
 display:flex;
 font-family: 'Prompt', sans-serif;
-align-items:center;
+/* align-items:center; */
 text-align:center;
 list-style:none; //เอาจุดดำออก 
 justify-content:center;
+
 @media screen and (max-width: 960px){ //หน้าจอต่ำกว่า 960px  
 display:flex;
 flex-direction:column;
