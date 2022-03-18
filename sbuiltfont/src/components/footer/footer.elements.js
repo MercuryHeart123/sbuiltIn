@@ -68,7 +68,7 @@ export const FooterLinkContainer = styled.div`
 `
 export const FooterLinkWrapper = styled.div`
     display:flex;
-    @media screen and (max-width:820px){
+    @media screen and (max-width:960px){
         flex-direction:column;
     }
 `
@@ -111,8 +111,8 @@ export const SocialMediaWrap = styled.div`
     align-items:center;
     width:100%;
     max-width:1000px;
-    margin:40px 0 0 0;
-    @media screen and (max-width:820px){
+    margin:20px 0 0 0;
+    @media screen and (max-width:960px){
         flex-direction:column;
     }
 `

@@ -17,6 +17,7 @@ import axios from "axios";
 import { connect } from "react-redux";
 import Edit from './pages/Authentication/edit';
 import { PrivateRoute } from './pages/Authentication/private';
+import Desc from './pages/Catalog Description/Des';
 
 
 const App = (props) => {
@@ -53,6 +54,7 @@ const App = (props) => {
           </Route>
           <Route path="/3d" element={<ThreeD />} />
           <Route path="/catalog" element={<Catalog />} />
+          <Route path="/desc/5" element={<Desc />} />
           <Route path="/contact" element={<Contact />} />
         </Routes>
         <Footer />
