@@ -1,0 +1,16 @@
+.flex-container {
+    display: flex;
+    padding-bottom: 8vh;
+    font-family: 'Prompt', sans-serif;
+}
+
+.flex-child {
+    flex: 1;
+    border: 2px solid lightgray;
+    border-radius: 20px;
+    padding: 10px;
+}  
+
+.flex-child:first-child {
+    margin-right: 20px;
+} 
