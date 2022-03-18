@@ -10,7 +10,7 @@ const MongoStore = require("connect-mongo");
 const { MongoClient } = require("mongodb");
 const { v4: uuidv4 } = require("uuid");
 
-const uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}:${process.env.DB_PORT}`;
+const uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}:${process.env.DB_PORT}/sbuiltin`;
 
 let port = process.env.PORT || 8080
 
@@ -122,21 +122,44 @@ app.post("/edit", async (req, res) => {
     var detail = req.body.detail;
     var price = req.body.price;
     var chkmodel = req.body.model;
-    var img64 = req.body.image;
-    const img = { img64 }
+    var image = req.body.image;
+    var dimension = req.body.dimension;
+    var place = req.body.place;
     // const { uid } = req.body;
 
     console.log(chkmodel)
     if (chkmodel == true) {
+        let path = [];
+        let imgUid = uuidv4();
+        fs.mkdirSync(`./model/${imgUid}`, { recursive: true });
+        let rootPath = `./model/${imgUid}`;
+        let imgPath;
+        console.log(image);
+        for (let i = 0; i < image.length; i++) {
+            imgUid = uuidv4();
+            let base64Image = image[i].split(";base64,").pop();
+            imgPath = rootPath + `/${imgUid}.jpg`;
+            path.push(imgPath);
+            fs.writeFile(
+                imgPath,
+                base64Image,
+                { encoding: "base64" },
+                function (err) {
+                    console.log(`jpg created`);
+                }
+            );
+        }
         var model = {
             title: name,
             about: detail,
-            price: price, 
+            price: price,
+            dimension: dimension,
+            pathimg: path,
             isModel: chkmodel
         }
         const client = new MongoClient(uri);
         await client.connect();
-        let info = await client.db("sbuiltin").collection("model").insertOne(model);
+        let info = await client.db("sbuiltin").collection("model").insert(model);
         if (info) {
             console.log("Data inserted");
             let JSONdata = JSON.stringify({
@@ -158,45 +181,36 @@ app.post("/edit", async (req, res) => {
     }
     else {
         let path = [];
-        let rootPath = './image';
-        fs.rmSync(rootPath, { recursive: true });
-        fs.mkdirSync(rootPath, { recursive: true });
         let imgUid = uuidv4();
-            // let base64Image = img[i].split(";base64,").pop();
-            let imgPath = rootPath + `/${imgUid}.jpg`;
+        fs.mkdirSync(`./catalog/${imgUid}`, { recursive: true });
+        let rootPath = `./catalog/${imgUid}`;
+        let imgPath;
+        console.log(image);
+        for (let i = 0; i < image.length; i++) {
+            imgUid = uuidv4();
+            let base64Image = image[i].split(";base64,").pop();
+            imgPath = rootPath + `/${imgUid}.jpg`;
             path.push(imgPath);
             fs.writeFile(
-              imgPath,
-              img64,
-            //   { encoding: "base64" },
-              function (err) {
-                console.log(`jpg created`);
-              }
+                imgPath,
+                base64Image,
+                { encoding: "base64" },
+                function (err) {
+                    console.log(`jpg created`);
+                }
             );
-        // for (let i = 0; i < img.length; i++) {
-        //     let imgUid = uuidv4();
-        //     // let base64Image = img[i].split(";base64,").pop();
-        //     let imgPath = rootPath + `/${imgUid}.jpg`;
-        //     path.push(imgPath);
-        //     fs.writeFile(
-        //       imgPath,
-        //       img64,
-        //     //   { encoding: "base64" },
-        //       function (err) {
-        //         console.log(`jpg created`);
-        //       }
-        //     );
-        //   }
+        }
         var cat = {
             title: name,
             about: detail,
             price: price,
-            pathimg: imgPath
+            place: place,
+            pathimg: path
         }
         console.log(imgPath);
         const client = new MongoClient(uri);
         await client.connect();
-        let info = await client.db("sbuiltin").collection("catalog").insertOne(cat);
+        let info = await client.db("sbuiltin").collection("catalog").insert(cat);
         if (info) {
             console.log("Data inserted");
             let JSONdata = JSON.stringify({
@@ -215,6 +229,7 @@ app.post("/edit", async (req, res) => {
             client.close();
             res.status(401).end(JSONdata);
         }
+
     }
 });
 
