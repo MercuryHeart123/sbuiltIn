@@ -7,7 +7,7 @@
 
 .Images:hover {
   opacity: 0.5;
-  background-color: black;
-  transition: 0.34s;
+  background: black;
+  transition: 0.35s;
   transform: scale(0.94);
 }
