@@ -34,7 +34,7 @@ const Edit = () => {
   const listAllModel = (type) => {
     console.log("hello");
     axios.defaults.withCredentials = true;
-    const urldata = url+"/"+type;
+    const urldata = url + "/" + type;
     axios.get(urldata)
       .then((res) => {
         let response = res.data;
@@ -52,7 +52,7 @@ const Edit = () => {
   const listDataCatalog = (e) => {
     e.preventDefault();
     axios.defaults.withCredentials = true;
-    const urldata = url+"/listcatalog";
+    const urldata = url + "/listcatalog";
     axios.get(urldata)
       .then((res) => {
         let response = res.data;
@@ -72,7 +72,7 @@ const Edit = () => {
     }
 
     return AllPost.map((post, index) => (
-      <div key={index} style={{marginTop: "10px"}}>
+      <div key={index} style={{ marginTop: "10px" }}>
         <h5>{post.title} &nbsp; {post.about} &nbsp; {post.place}</h5>
         <img src={post.pathimg}></img>
       </div>
@@ -85,7 +85,7 @@ const Edit = () => {
     }
 
     return AllModel.map((post, index) => (
-      <div key={index} style={{marginTop: "10px"}}>
+      <div key={index} style={{ marginTop: "10px" }}>
         <h5>{post.title} &nbsp; {post.about} &nbsp; {post.dimension}</h5>
         <img src={post.pathimg}></img>
       </div>
@@ -114,18 +114,18 @@ const Edit = () => {
 
   const getItems = async () => {
     try {
-      const { data } = await axios.get(url+"/edit");
+      const { data } = await axios.get(url + "/edit");
       return data
     } catch (error) {
       console.log(error);
-      console.log(url+"/edit");
+      console.log(url + "/edit");
       alert("Failed: client and server are out of sync!");
     }
   }
 
   const createItem = async (todo) => {
     try {
-      const { data } = await axios.post(url+"/edit", todo);
+      const { data } = await axios.post(url + "/edit", todo);
       alert("Complete: data has been uploaded!");
       console.log(data);
       return data
@@ -156,7 +156,7 @@ const Edit = () => {
     // } else {
     //   x.style.display = "block";
     // }
-    if(display !== "catalog") {
+    if (display !== "catalog") {
       listAllModel("listcatalog");
       setDisplay("catalog");
     }
@@ -170,7 +170,7 @@ const Edit = () => {
     // } else {
     //   x.style.display = "block";
     // }
-    if(display !== "model") {
+    if (display !== "model") {
       listAllModel("listmodel");
       setDisplay("model");
     }
@@ -183,7 +183,7 @@ const Edit = () => {
     //   console.log('fetch data;m', result)
     //   setItems(result);
     // }
-  
+
     // fetchData();
     // listDataCatalog();
     // listDataModel();
@@ -202,28 +202,37 @@ const Edit = () => {
       <div className="flex-container">
         {display == "catalog" && <div className="flex-child lightyellow" id="catalog" style={{ borderColor: "darkblue" }}>
           <form action="" onSubmit={onSubmitCatalog}>
+            <u><h5>All post in catalog (รายการทั้งหมดของ catalog)</h5></u>
+            <div>
+              {allModel ? allModel.map((model, index) => {
+                return (
+                  <div>{model.title}</div>)
+              }) : null}
+            </div>
             <u><h5>To catalog (เพิ่มแคตตาล้อก)</h5></u>
             <label for="name">&nbsp; Name (ชื่อผลงาน)</label>
             <br />
-            <input type="text" id="name" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }}
+
+            <input required type="text" id="name" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }}
 
               onChange={e => setItem({ ...item, name: e.target.value })}
             />
             <br />
             <label for="detail">&nbsp; Enter detail (รายละเอียด)</label>
             <br />
-            <input type="text" id="detail" className="form-control" placeholder="Enter detail" style={{ borderColor: "black", borderRadius: "5px" }}
+            <input required type="text" id="detail" className="form-control" placeholder="Enter detail" style={{ borderColor: "black", borderRadius: "5px" }}
 
               onChange={e => setItem({ ...item, detail: e.target.value })}
             />
             <br />
             <label for="place">&nbsp; Place (สถานที่)</label>
             <br />
-            <input type="text" id="place" className="form-control" placeholder="Enter place" style={{ borderColor: "black", borderRadius: "5px" }}
+            <input required type="text" id="place" className="form-control" placeholder="Enter place" style={{ borderColor: "black", borderRadius: "5px" }}
 
               onChange={e => setItem({ ...item, place: e.target.value })}
             />
             <input
+              required
               class="form-control"
               type="file"
               accept=".jpg,.png,.jpeg"
@@ -241,51 +250,48 @@ const Edit = () => {
 
             </div>
           </form>
-          <button  className="btn btn-primary btn-block" id="load-model" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} onClick={() => {
-              listAllModel("listcatalog")}}>Load catalog data</button>
-            <div>
-            {allModel ? allModel.map((model, index) => {
-                return (
-                <div>{model.title}</div>)
-              }) : null}
-          </div>
-          
+          <button className="btn btn-primary btn-block" id="load-model" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} onClick={() => {
+            listAllModel("listcatalog")
+          }}>Load catalog data</button>
 
-        </div> }
-        {display== "model" && <div className="flex-child lightgreen" id="model" style={{ borderColor: "green" }}>
+
+
+        </div>}
+        {display == "model" && <div className="flex-child lightgreen" id="model" style={{ borderColor: "green" }}>
           <form action="" onSubmit={onSubmitModel}>
             <u><h5>To model (เพิ่มโมเดล)</h5></u>
             <label for="name">&nbsp; Name (ชื่อโมเดล)</label>
             <br />
-            <input type="text" id="name" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }}
+            <input required type="text" id="name" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }}
 
               onChange={e => {
                 setItem({ ...item, name: e.target.value, model: true })
-               
+
               }}
             />
             <br />
             <label for="detail">&nbsp; Enter detail (รายละเอียดโมเดล)</label>
             <br />
-            <input type="text" id="detail" className="form-control" placeholder="Enter detail" style={{ borderColor: "black", borderRadius: "5px" }}
+            <input required type="text" id="detail" className="form-control" placeholder="Enter detail" style={{ borderColor: "black", borderRadius: "5px" }}
 
               onChange={e => setItem({ ...item, detail: e.target.value })}
             />
             <br />
             <label for="price">&nbsp; Enter price (ราคา)</label>
             <br />
-            <input type="text" id="price" className="form-control" placeholder="Enter price" style={{ borderColor: "black", borderRadius: "5px" }}
+            <input required type="text" id="price" className="form-control" placeholder="Enter price" style={{ borderColor: "black", borderRadius: "5px" }}
 
               onChange={e => setItem({ ...item, price: e.target.value })}
             />
             <br />
             <label for="dimension">&nbsp; Dimension (ขนาด)</label>
             <br />
-            <input type="text" id="dimension" className="form-control" placeholder="Enter dimension" style={{ borderColor: "black", borderRadius: "5px" }}
+            <input required type="text" id="dimension" className="form-control" placeholder="Enter dimension" style={{ borderColor: "black", borderRadius: "5px" }}
 
               onChange={e => setItem({ ...item, dimension: e.target.value })}
             />
             <input
+              required
               class="form-control"
               type="file"
               accept=".gltf"
@@ -300,6 +306,7 @@ const Edit = () => {
             <br />
             <br />
             <input
+              required
               class="form-control"
               type="file"
               accept=".jpg,.png,.jpeg,.bmp"
@@ -315,18 +322,19 @@ const Edit = () => {
               <button type="reset" className="btn btn-primary btn-block" value="Reset" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red", marginLeft: "10px" }}>Reset form</button>
             </div>
           </form>
-            <button  className="btn btn-primary btn-block" id="load-model" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} onClick={() => {
-              listAllModel("listmodel")}}>Load model data</button>
-            <div>
-              {allModel ? allModel.map((model, index) => {
-                return (
+          <button className="btn btn-primary btn-block" id="load-model" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} onClick={() => {
+            listAllModel("listmodel")
+          }}>Load model data</button>
+          <div>
+            {allModel ? allModel.map((model, index) => {
+              return (
                 <div>{model.title}</div>)
-              }) : null}
+            }) : null}
           </div>
-          
+
         </div>}
-        
-        
+
+
       </div>
     </div>
 

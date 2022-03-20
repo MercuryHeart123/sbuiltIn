@@ -43,10 +43,12 @@ const Login = (props) => {
         <div
             style={{
                 paddingBottom: "20vh",
-                paddingTop:"9vh",
+                paddingTop: "9vh",
                 width: "30vw",
                 margin: "0 auto",
                 textAlign: "left",
+                minHeight: '80vh',
+                maxHeight: '80vh'
             }}
         >
             <form onSubmit={handleSubmit}>
