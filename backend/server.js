@@ -101,12 +101,11 @@ app.get("/listmodel", async (req, res) => {
     await client.connect();
     let result = await client.db("sbuiltin").collection("model").find({}, { projection: { _id: 0, title: 1, about: 1, dimension: 1, price: 1, pathimg: 1} }).toArray();
     console.log("Hello from get listmodel");
+    // console.log(result);
     res.send(result);
 })
 
 app.get("/listcatalog", async (req, res) => {
-    const { title } = req.body;
-    let query = { title };
     const client = new MongoClient(uri);
     await client.connect();
     let result = await client.db("sbuiltin").collection("catalog").find({}, { projection: { _id: 0, title: 1, about: 1, place: 1, pathimg: 1} }).toArray();
@@ -115,8 +114,8 @@ app.get("/listcatalog", async (req, res) => {
 })
 
 app.get("/edit", async (req, res) => {
-    const { title, image64 } = req.body;
-    let query = { title, image64 };
+    // const { title, image64 } = req.body;
+    // let query = { title, image64 };
     const client = new MongoClient(uri);
     await client.connect();
     const database = client.db("sbuiltin");
@@ -143,8 +142,8 @@ app.post("/edit", async (req, res) => {
     var place = req.body.place;
     // const { uid } = req.body;
 
-    console.log(chkmodel);
-    if (chkmodel === "3D") {
+    console.log("this is model check = " + chkmodel);
+    if (chkmodel === true) {
         let path = [];
         let imgUid = uuidv4();
         fs.mkdirSync(`./model/${imgUid}`, { recursive: true });
@@ -190,7 +189,7 @@ app.post("/edit", async (req, res) => {
         else {
             console.log("Error");
             let JSONdata = JSON.stringify({
-                status: "๊Failed",
+                status: "Failed",
                 msg: "Error! Cannot connect to database.",
             });
             client.close();
@@ -243,7 +242,7 @@ app.post("/edit", async (req, res) => {
         else {
             console.log("Error");
             let JSONdata = JSON.stringify({
-                status: "๊Failed",
+                status: "Failed",
                 msg: "Error! Cannot connect to database.",
             });
             client.close();

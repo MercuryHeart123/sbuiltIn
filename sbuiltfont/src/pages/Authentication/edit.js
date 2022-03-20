@@ -5,32 +5,54 @@ import './edit.css';
 
 const Edit = () => {
 
-  const [item, setItem] = useState({ name: '', detail: '', dimension: '', price: '', place: '', image: [], full64: [], AllPost: [], model: '' });
+  const [item, setItem] = useState({ name: '', detail: '', dimension: '', price: '', place: '', image: [], full64: [], AllPost: [], AllModel: [], model: false });
   const [items, setItems] = useState([]);
+  const [display, setDisplay] = useState("catalog");
+  const [allModel, setallModel] = useState([]);
 
-  const url = "http://localhost:8080/edit";
+  const url = `${process.env.REACT_APP_IP}:${process.env.REACT_APP_PORT}`;
 
-  const listDataModel = (e) => {
-    e.preventDefault();
+  // const listDataModel = (e) => {
+  //   e.preventDefault();
+
+  //   // axios.defaults.withCredentials = true;
+  //   // const urldata = url+"/listmodel";
+  //   // axios.get(urldata)
+  //   //   .then((res) => {
+  //   //     let response = res.data;
+  //   //     setItem({ ...item, AllModel: response });
+  //   //     console.log(response);
+  //   //     console.log("Data has been received");
+  //   //   })
+  //   //   .catch((err) => {
+  //   //     alert(err.response.data.msg);
+  //   //     console.log("Error: either server or database is down!");
+  //   //   })
+
+  // }
+
+  const listAllModel = (type) => {
+    console.log("hello");
     axios.defaults.withCredentials = true;
-    const urldata = "http://localhost:8080/listmodel";
+    const urldata = url+"/"+type;
     axios.get(urldata)
       .then((res) => {
         let response = res.data;
-        setItem({ ...item, AllPost: response });
+        setallModel([...response]);
         console.log(response);
         console.log("Data has been received");
       })
       .catch((err) => {
+        console.log(err);
         alert(err.response.data.msg);
         console.log("Error: either server or database is down!");
       })
-
   }
+
   const listDataCatalog = (e) => {
     e.preventDefault();
     axios.defaults.withCredentials = true;
-    const urldata = "http://localhost:8080/listcatalog";
+    const urldata = url+"/listcatalog";
     axios.get(urldata)
       .then((res) => {
         let response = res.data;
@@ -57,12 +79,12 @@ const Edit = () => {
     ));
   };
 
-  const displayModel = (AllPost) => {
-    if (!AllPost.length) {
+  const displayModel = (AllModel) => {
+    if (!AllModel.length) {
       return null;
     }
 
-    return AllPost.map((post, index) => (
+    return AllModel.map((post, index) => (
       <div key={index} style={{marginTop: "10px"}}>
         <h5>{post.title} &nbsp; {post.about} &nbsp; {post.dimension}</h5>
         <img src={post.pathimg}></img>
@@ -92,18 +114,20 @@ const Edit = () => {
 
   const getItems = async () => {
     try {
-      const { data } = await axios.get(url);
+      const { data } = await axios.get(url+"/edit");
       return data
     } catch (error) {
       console.log(error);
+      console.log(url+"/edit");
       alert("Failed: client and server are out of sync!");
     }
   }
 
   const createItem = async (todo) => {
     try {
-      const { data } = await axios.post(url, todo);
+      const { data } = await axios.post(url+"/edit", todo);
       alert("Complete: data has been uploaded!");
+      console.log(data);
       return data
     } catch (error) {
       console.log(error);
@@ -112,49 +136,58 @@ const Edit = () => {
   }
 
   const onSubmitModel = async (e) => {
-    console.log(item.model);
-    setItem({ ...item, model: "3D"});
     e.preventDefault();
-    const result = await createItem(item);
-    setItems([...items, result]);
+    // const result = await createItem(item);
+    // setItems([...items, result]);
     // window.location.reload(false);
   }
 
   const onSubmitCatalog = async (e) => {
     e.preventDefault();
-    const result = await createItem(item);
-    setItems([...items, result]);
+    // const result = await createItem(item);
+    // setItems([...items, result]);
     // window.location.reload(false);
   }
 
   const toggleCatalog = () => {
-    var x = document.getElementById("catalog");
-    if (x.style.display !== "none") {
-      x.style.display = "none";
-    } else {
-      x.style.display = "block";
+    // var x = document.getElementById("catalog");
+    // if (x.style.display !== "none") {
+    //   x.style.display = "none";
+    // } else {
+    //   x.style.display = "block";
+    // }
+    if(display !== "catalog") {
+      listAllModel("listcatalog");
+      setDisplay("catalog");
     }
+
   }
 
   const toggleModel = () => {
-    var x = document.getElementById("model");
-    if (x.style.display !== "none") {
-      x.style.display = "none";
-    } else {
-      x.style.display = "block";
+    // var x = document.getElementById("model");
+    // if (x.style.display !== "none") {
+    //   x.style.display = "none";
+    // } else {
+    //   x.style.display = "block";
+    // }
+    if(display !== "model") {
+      listAllModel("listmodel");
+      setDisplay("model");
     }
+
   }
 
   useEffect(() => {
-    const fetchData = async () => {
-      const result = await getItems();
-      console.log('fetch data;m', result)
-      setItems(result);
-    }
+    // const fetchData = async () => {
+    //   const result = await getItems();
+    //   console.log('fetch data;m', result)
+    //   setItems(result);
+    // }
   
-    fetchData();
+    // fetchData();
     // listDataCatalog();
     // listDataModel();
+    listAllModel("listcatalog");
   }, [])
 
   return (
@@ -167,7 +200,7 @@ const Edit = () => {
       <button className="btn btn-primary btn-block" id="btn-model" style={{ backgroundColor: "green", borderColor: "green", marginLeft: "5px", marginBottom: "5px" }} onClick={toggleModel}>Model (โมเดล)</button>
 
       <div className="flex-container">
-        <div className="flex-child lightyellow" id="catalog" style={{ display: 'none', borderColor: "darkblue" }}>
+        {display == "catalog" && <div className="flex-child lightyellow" id="catalog" style={{ borderColor: "darkblue" }}>
           <form action="" onSubmit={onSubmitCatalog}>
             <u><h5>To catalog (เพิ่มแคตตาล้อก)</h5></u>
             <label for="name">&nbsp; Name (ชื่อผลงาน)</label>
@@ -208,23 +241,28 @@ const Edit = () => {
 
             </div>
           </form>
-          <form action="" onSubmit={listDataCatalog}>
-            <button type="loaddata" className="btn btn-primary btn-block" id="load-catalog" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} >Load catalog data</button>
+          <button  className="btn btn-primary btn-block" id="load-model" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} onClick={() => {
+              listAllModel("listcatalog")}}>Load catalog data</button>
             <div>
-            {displayCatalog(item.AllPost)}
+            {allModel ? allModel.map((model, index) => {
+                return (
+                <div>{model.title}</div>)
+              }) : null}
           </div>
-          </form>
           
 
-        </div>
-        <div className="flex-child lightgreen" id="model" style={{ display: 'none', borderColor: "green" }}>
+        </div> }
+        {display== "model" && <div className="flex-child lightgreen" id="model" style={{ borderColor: "green" }}>
           <form action="" onSubmit={onSubmitModel}>
             <u><h5>To model (เพิ่มโมเดล)</h5></u>
             <label for="name">&nbsp; Name (ชื่อโมเดล)</label>
             <br />
             <input type="text" id="name" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }}
 
-              onChange={e => setItem({ ...item, name: e.target.value })}
+              onChange={e => {
+                setItem({ ...item, name: e.target.value, model: true })
+               
+              }}
             />
             <br />
             <label for="detail">&nbsp; Enter detail (รายละเอียดโมเดล)</label>
@@ -255,7 +293,6 @@ const Edit = () => {
               style={{ marginTop: "10px" }}
               onChange={(e) => {
                 selectFiles(e.target.files);
-                setItem({ ...item, model: "3D" });
               }}
               multiple="multiple"
             />
@@ -268,10 +305,7 @@ const Edit = () => {
               accept=".jpg,.png,.jpeg,.bmp"
               id="image"
               style={{ marginTop: "10px" }}
-              onChange={(e) => {
-                selectFiles(e.target.files);
-                setItem({ ...item, model: "3D" });
-              }}
+              onChange={(e) => selectFiles(e.target.files)}
             />
             <label for="image">Upload preview model (Support .jpg .png .jpeg .bmp)</label>
             <br />
@@ -281,14 +315,18 @@ const Edit = () => {
               <button type="reset" className="btn btn-primary btn-block" value="Reset" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red", marginLeft: "10px" }}>Reset form</button>
             </div>
           </form>
-          <form action="" onSubmit={listDataModel}>
-            <button type="loaddata" className="btn btn-primary btn-block" id="load-model" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} >Load catalog data</button>
+            <button  className="btn btn-primary btn-block" id="load-model" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} onClick={() => {
+              listAllModel("listmodel")}}>Load model data</button>
             <div>
-            {displayModel(item.AllPost)}
+              {allModel ? allModel.map((model, index) => {
+                return (
+                <div>{model.title}</div>)
+              }) : null}
           </div>
-          </form>
           
-        </div>
+        </div>}
+        
+        
       </div>
     </div>
 
