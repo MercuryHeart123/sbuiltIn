@@ -1,13 +1,74 @@
 import React, { useEffect, useState } from 'react';
-import FileBase64 from 'react-file-base64';
-import { createItem, getItems } from './editfunction.js';
+import axios from 'axios';
 import '../../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import './edit.css';
 
 const Edit = () => {
 
-  const [item, setItem] = useState({ name: '', detail: '', dimension: '', price: '', place: '', image: [], full64: [], model: false });
+  const [item, setItem] = useState({ name: '', detail: '', dimension: '', price: '', place: '', image: [], full64: [], AllPost: [], model: '' });
   const [items, setItems] = useState([]);
+
+  const url = "http://localhost:8080/edit";
+
+  const listDataModel = (e) => {
+    e.preventDefault();
+    axios.defaults.withCredentials = true;
+    const urldata = "http://localhost:8080/listmodel";
+    axios.get(urldata)
+      .then((res) => {
+        let response = res.data;
+        setItem({ ...item, AllPost: response });
+        console.log(response);
+        console.log("Data has been received");
+      })
+      .catch((err) => {
+        alert(err.response.data.msg);
+        console.log("Error: either server or database is down!");
+      })
+
+  }
+  const listDataCatalog = (e) => {
+    e.preventDefault();
+    axios.defaults.withCredentials = true;
+    const urldata = "http://localhost:8080/listcatalog";
+    axios.get(urldata)
+      .then((res) => {
+        let response = res.data;
+        setItem({ ...item, AllPost: response });
+        console.log(response);
+        console.log("Data has been received");
+      })
+      .catch((err) => {
+        alert(err.response.data.msg);
+        console.log("Error: either server or database is down!");
+      })
+  }
+
+  const displayCatalog = (AllPost) => {
+    if (!AllPost.length) {
+      return null;
+    }
+
+    return AllPost.map((post, index) => (
+      <div key={index} style={{marginTop: "10px"}}>
+        <h5>{post.title} &nbsp; {post.about} &nbsp; {post.place}</h5>
+        <img src={post.pathimg}></img>
+      </div>
+    ));
+  };
+
+  const displayModel = (AllPost) => {
+    if (!AllPost.length) {
+      return null;
+    }
+
+    return AllPost.map((post, index) => (
+      <div key={index} style={{marginTop: "10px"}}>
+        <h5>{post.title} &nbsp; {post.about} &nbsp; {post.dimension}</h5>
+        <img src={post.pathimg}></img>
+      </div>
+    ));
+  };
 
   const selectFiles = (e) => {
     let imgdata = item.full64;
@@ -29,18 +90,59 @@ const Edit = () => {
     reader.readAsDataURL(img);
   }
 
-  const onSubmitHandler = async (e) => {
-    e.preventDefault();
-    const result = await createItem(item);
-
-    setItems([...items, result]);
+  const getItems = async () => {
+    try {
+      const { data } = await axios.get(url);
+      return data
+    } catch (error) {
+      console.log(error);
+      alert("Failed: client and server are out of sync!");
+    }
   }
 
-  const onSubmitHandlerModel = async (e) => {
+  const createItem = async (todo) => {
+    try {
+      const { data } = await axios.post(url, todo);
+      alert("Complete: data has been uploaded!");
+      return data
+    } catch (error) {
+      console.log(error);
+      alert("Failed: client and server are out of sync!");
+    }
+  }
+
+  const onSubmitModel = async (e) => {
+    console.log(item.model);
+    setItem({ ...item, model: "3D"});
     e.preventDefault();
     const result = await createItem(item);
-
     setItems([...items, result]);
+    // window.location.reload(false);
+  }
+
+  const onSubmitCatalog = async (e) => {
+    e.preventDefault();
+    const result = await createItem(item);
+    setItems([...items, result]);
+    // window.location.reload(false);
+  }
+
+  const toggleCatalog = () => {
+    var x = document.getElementById("catalog");
+    if (x.style.display !== "none") {
+      x.style.display = "none";
+    } else {
+      x.style.display = "block";
+    }
+  }
+
+  const toggleModel = () => {
+    var x = document.getElementById("model");
+    if (x.style.display !== "none") {
+      x.style.display = "none";
+    } else {
+      x.style.display = "block";
+    }
   }
 
   useEffect(() => {
@@ -49,33 +151,40 @@ const Edit = () => {
       console.log('fetch data;m', result)
       setItems(result);
     }
+  
     fetchData();
+    // listDataCatalog();
+    // listDataModel();
   }, [])
 
   return (
-    <div className="container" style={{fontFamily: "Prompt, sans-serif"}}>
-      <br/>
+    <div className="container" style={{ fontFamily: "Prompt, sans-serif" }}>
+      <br />
       <h4>Add data to catalog or add an model (เพิ่มข้อมูลไปยังแคตตาล้อกหรือเพิ่มโมเดล)</h4>
+      <br />
+      <h5>คุณต้องการแก้ไขหรือเพิ่มข้อมูลไปยังส่วนใด?</h5>
+      <button className="btn btn-primary btn-block" id="btn-catalog" style={{ backgroundColor: "darkblue", borderColor: "darkblue", marginRight: "5px", marginBottom: "5px" }} onClick={toggleCatalog}>Catalog (แคตตาล้อก)</button>
+      <button className="btn btn-primary btn-block" id="btn-model" style={{ backgroundColor: "green", borderColor: "green", marginLeft: "5px", marginBottom: "5px" }} onClick={toggleModel}>Model (โมเดล)</button>
+
       <div className="flex-container">
-        {/* <pre>{JSON.stringify(item, null, '\t')}</pre> */}
-        <div className="flex-child lightyellow">
-          <form action="" onSubmit={onSubmitHandler}>
-            <u><h5>To catalog</h5></u>
-            <label for="name">&nbsp; Name</label>
+        <div className="flex-child lightyellow" id="catalog" style={{ display: 'none', borderColor: "darkblue" }}>
+          <form action="" onSubmit={onSubmitCatalog}>
+            <u><h5>To catalog (เพิ่มแคตตาล้อก)</h5></u>
+            <label for="name">&nbsp; Name (ชื่อผลงาน)</label>
             <br />
             <input type="text" id="name" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }}
 
               onChange={e => setItem({ ...item, name: e.target.value })}
             />
             <br />
-            <label for="detail">&nbsp; Enter detail</label>
+            <label for="detail">&nbsp; Enter detail (รายละเอียด)</label>
             <br />
             <input type="text" id="detail" className="form-control" placeholder="Enter detail" style={{ borderColor: "black", borderRadius: "5px" }}
 
               onChange={e => setItem({ ...item, detail: e.target.value })}
             />
             <br />
-            <label for="place">&nbsp; Place</label>
+            <label for="place">&nbsp; Place (สถานที่)</label>
             <br />
             <input type="text" id="place" className="form-control" placeholder="Enter place" style={{ borderColor: "black", borderRadius: "5px" }}
 
@@ -84,71 +193,55 @@ const Edit = () => {
             <input
               class="form-control"
               type="file"
+              accept=".jpg,.png,.jpeg"
               id="image"
+              style={{ marginTop: "10px" }}
               onChange={(e) => selectFiles(e.target.files)}
               multiple="multiple"
             />
-            <label for="image">Support .gltf .jpg .png</label>
+            <label for="image">Support .jpeg .jpg .png</label>
             <br />
             <br />
             <div className="right-align">
               <button type="submit" className="btn btn-primary btn-block" id="to-catalog" style={{ marginTop: "2vh" }}>Submit</button>
+              <button type="reset" className="btn btn-primary btn-block" value="Reset" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red", marginLeft: "10px" }}>Reset form</button>
+
             </div>
           </form>
-
-          {/* <h4>Delete existing model or catalog data (not finished)</h4>
-      <form action="" onSubmit={(e) => {
-        e.preventDefault();
-        useEffect.fetchData();
-      }}>
-        <div className='right-align'>
-          <button type="submit" className="btn btn-primary btn-block" id="load-data" style={{ marginTop: "2vh", backgroundColor: "green", borderColor: "darkgreen" }}>Load data from database</button>
-          <label for="load-data">Not finished</label>
-        </div>
-      </form> */}
-          {/* {items?.map(item => (
-
-        <div className="card" key={item._id}>
-          <div className="card-image waves-effect waves-block waves-light">
-            <img className="activator" style={{ width: '70%', height: '70%' }} src={item.image} />
+          <form action="" onSubmit={listDataCatalog}>
+            <button type="loaddata" className="btn btn-primary btn-block" id="load-catalog" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} >Load catalog data</button>
+            <div>
+            {displayCatalog(item.AllPost)}
           </div>
-          <div className="card-content">
-            <span className="card-title activator grey-text text-darken-4">{item.title}</span>
-          </div>
+          </form>
+          
 
         </div>
-
-
-
-      ))} */}
-        </div>
-        <div className="flex-child lightgreen">
-          <form action="" onSubmit={onSubmitHandlerModel}>
-            <u><h5>To model</h5></u>
-            <label for="name">&nbsp; Name</label>
+        <div className="flex-child lightgreen" id="model" style={{ display: 'none', borderColor: "green" }}>
+          <form action="" onSubmit={onSubmitModel}>
+            <u><h5>To model (เพิ่มโมเดล)</h5></u>
+            <label for="name">&nbsp; Name (ชื่อโมเดล)</label>
             <br />
             <input type="text" id="name" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }}
 
-              onChange={e => {
-                setItem({ ...item, name: e.target.value })
-                setItem({ ...item, model: true })}}
+              onChange={e => setItem({ ...item, name: e.target.value })}
             />
             <br />
-            <label for="detail">&nbsp; Enter detail</label>
+            <label for="detail">&nbsp; Enter detail (รายละเอียดโมเดล)</label>
             <br />
             <input type="text" id="detail" className="form-control" placeholder="Enter detail" style={{ borderColor: "black", borderRadius: "5px" }}
 
               onChange={e => setItem({ ...item, detail: e.target.value })}
             />
             <br />
-            <label for="price">&nbsp; Enter price</label>
+            <label for="price">&nbsp; Enter price (ราคา)</label>
             <br />
             <input type="text" id="price" className="form-control" placeholder="Enter price" style={{ borderColor: "black", borderRadius: "5px" }}
 
               onChange={e => setItem({ ...item, price: e.target.value })}
             />
             <br />
-            <label for="dimension">&nbsp; Dimension</label>
+            <label for="dimension">&nbsp; Dimension (ขนาด)</label>
             <br />
             <input type="text" id="dimension" className="form-control" placeholder="Enter dimension" style={{ borderColor: "black", borderRadius: "5px" }}
 
@@ -157,24 +250,51 @@ const Edit = () => {
             <input
               class="form-control"
               type="file"
+              accept=".gltf"
               id="image"
-              onChange={(e) => selectFiles(e.target.files)}
+              style={{ marginTop: "10px" }}
+              onChange={(e) => {
+                selectFiles(e.target.files);
+                setItem({ ...item, model: "3D" });
+              }}
               multiple="multiple"
             />
-            <label for="image">Support .gltf .jpg .png</label>
+            <label for="image">Upload model (Support .gltf)</label>
+            <br />
+            <br />
+            <input
+              class="form-control"
+              type="file"
+              accept=".jpg,.png,.jpeg,.bmp"
+              id="image"
+              style={{ marginTop: "10px" }}
+              onChange={(e) => {
+                selectFiles(e.target.files);
+                setItem({ ...item, model: "3D" });
+              }}
+            />
+            <label for="image">Upload preview model (Support .jpg .png .jpeg .bmp)</label>
             <br />
             <br />
             <div className="right-align">
-              <button type="submit" className="btn btn-primary btn-block" id="to-catalog" style={{ marginTop: "2vh" }}>Submit</button>
+              <button type="submit" className="btn btn-primary btn-block" id="to-model" style={{ marginTop: "2vh" }}>Submit</button>
+              <button type="reset" className="btn btn-primary btn-block" value="Reset" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red", marginLeft: "10px" }}>Reset form</button>
             </div>
           </form>
-
+          <form action="" onSubmit={listDataModel}>
+            <button type="loaddata" className="btn btn-primary btn-block" id="load-model" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} >Load catalog data</button>
+            <div>
+            {displayModel(item.AllPost)}
+          </div>
+          </form>
+          
         </div>
       </div>
     </div>
 
   );
 }
+
 
 
 export default Edit;

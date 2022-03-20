@@ -1,16 +1,20 @@
 .flex-container {
     display: flex;
     padding-bottom: 8vh;
+    width: 70vw;
+    position: static;
     font-family: 'Prompt', sans-serif;
 }
 
 .flex-child {
     flex: 1;
-    border: 2px solid lightgray;
+    border: 3px solid lightgray;
     border-radius: 20px;
     padding: 10px;
+    position: static;
 }  
 
 .flex-child:first-child {
     margin-right: 20px;
+    position: static;
 } 

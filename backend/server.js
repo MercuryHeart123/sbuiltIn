@@ -96,20 +96,36 @@ app.post("/logout", checkAuth, (req, res) => {
     });
 });
 
+app.get("/listmodel", async (req, res) => {
+    const client = new MongoClient(uri);
+    await client.connect();
+    let result = await client.db("sbuiltin").collection("model").find({}, { projection: { _id: 0, title: 1, about: 1, dimension: 1, price: 1, pathimg: 1} }).toArray();
+    console.log("Hello from get listmodel");
+    res.send(result);
+})
+
+app.get("/listcatalog", async (req, res) => {
+    const { title } = req.body;
+    let query = { title };
+    const client = new MongoClient(uri);
+    await client.connect();
+    let result = await client.db("sbuiltin").collection("catalog").find({}, { projection: { _id: 0, title: 1, about: 1, place: 1, pathimg: 1} }).toArray();
+    console.log("Hello from get listcatalog");
+    res.send(result);
+})
+
 app.get("/edit", async (req, res) => {
-    // const { title, image64 } = req.body;
-    // let query = { title, image64 };
+    const { title, image64 } = req.body;
+    let query = { title, image64 };
     const client = new MongoClient(uri);
     await client.connect();
     const database = client.db("sbuiltin");
     const catalog = database.collection("catalog");
     const model = database.collection("model");
     try {
-        //Not finished
         let info = await model.find();
         let info2 = await catalog.find();
-        // res.status(200).json(dir);
-        // await info2.forEach(console.dir);
+        res.send(JSON.stringify(info));
         console.log("Hello from get edit");
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -127,25 +143,25 @@ app.post("/edit", async (req, res) => {
     var place = req.body.place;
     // const { uid } = req.body;
 
-    console.log(chkmodel)
-    if (chkmodel == true) {
+    console.log(chkmodel);
+    if (chkmodel === "3D") {
         let path = [];
         let imgUid = uuidv4();
         fs.mkdirSync(`./model/${imgUid}`, { recursive: true });
         let rootPath = `./model/${imgUid}`;
         let imgPath;
-        console.log(image);
+        console.log(name);
         for (let i = 0; i < image.length; i++) {
             imgUid = uuidv4();
             let base64Image = image[i].split(";base64,").pop();
-            imgPath = rootPath + `/${imgUid}.jpg`;
+            imgPath = rootPath + `/${imgUid}.gltf`;
             path.push(imgPath);
             fs.writeFile(
                 imgPath,
                 base64Image,
                 { encoding: "base64" },
                 function (err) {
-                    console.log(`jpg created`);
+                    console.log(`gltf created`);
                 }
             );
         }
@@ -155,11 +171,12 @@ app.post("/edit", async (req, res) => {
             price: price,
             dimension: dimension,
             pathimg: path,
+            uid: imgUid,
             isModel: chkmodel
         }
         const client = new MongoClient(uri);
         await client.connect();
-        let info = await client.db("sbuiltin").collection("model").insert(model);
+        let info = await client.db("sbuiltin").collection("model").insertOne(model);
         if (info) {
             console.log("Data inserted");
             let JSONdata = JSON.stringify({
@@ -168,6 +185,7 @@ app.post("/edit", async (req, res) => {
             });
             client.close();
             res.status(200).end(JSONdata);
+            console.log(JSONdata);
         }
         else {
             console.log("Error");
@@ -177,6 +195,7 @@ app.post("/edit", async (req, res) => {
             });
             client.close();
             res.status(401).end(JSONdata);
+            console.log(JSONdata);
         }
     }
     else {
@@ -185,7 +204,7 @@ app.post("/edit", async (req, res) => {
         fs.mkdirSync(`./catalog/${imgUid}`, { recursive: true });
         let rootPath = `./catalog/${imgUid}`;
         let imgPath;
-        console.log(image);
+        // console.log(image);
         for (let i = 0; i < image.length; i++) {
             imgUid = uuidv4();
             let base64Image = image[i].split(";base64,").pop();
@@ -203,14 +222,14 @@ app.post("/edit", async (req, res) => {
         var cat = {
             title: name,
             about: detail,
-            price: price,
             place: place,
-            pathimg: path
+            pathimg: path,
+            uid: imgUid,
         }
         console.log(imgPath);
         const client = new MongoClient(uri);
         await client.connect();
-        let info = await client.db("sbuiltin").collection("catalog").insert(cat);
+        let info = await client.db("sbuiltin").collection("catalog").insertOne(cat);
         if (info) {
             console.log("Data inserted");
             let JSONdata = JSON.stringify({
@@ -219,6 +238,7 @@ app.post("/edit", async (req, res) => {
             });
             client.close();
             res.status(200).end(JSONdata);
+            console.log(JSONdata);
         }
         else {
             console.log("Error");
@@ -228,6 +248,7 @@ app.post("/edit", async (req, res) => {
             });
             client.close();
             res.status(401).end(JSONdata);
+            console.log(JSONdata);
         }
 
     }
