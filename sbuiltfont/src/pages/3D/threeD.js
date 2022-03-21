@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import CreateMenu from './createMenu'
 import EachCustomize from './eachCustomize'
 import Box from './box'
-
+import { IoChevronBack } from 'react-icons/io5';
 
 const ThreeD = () => {
     const [angle, setAngle] = useState(0)
@@ -98,17 +98,10 @@ const ThreeD = () => {
 
     return (
         <div>
-            <Link to='/' style={{
-                margin: '10px',
-                padding: '10px',
-                position: 'absolute',
-                zIndex: '500',
-                fontFamily: 'Prompt',
-                textDecoration: 'none',
-                color: 'black',
-                userSelect: 'none',
-            }}>
-                BACK
+            <Link to='/' >
+            <div className="Backbtn">
+                <IoChevronBack />
+            </div>
             </Link>
             <div style={{
                 display: 'flex',

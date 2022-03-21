@@ -71,8 +71,8 @@ const Catalog = ()=>{
   for (let i = 0 ; i < images.length; i++)
   {
     return(
-    <div style={{height:'100vh'}}>
-      <StackGrid columnWidth={180} duration={450} monitorImagesLoaded={true} style={{cursor:'pointer',width:'100%'}}>
+    <div style={{minHeight:'80vh'}}>
+      <StackGrid columnWidth={150} duration={450} monitorImagesLoaded={true} style={{cursor:'pointer',width:'100%'}}>
         {images.map((img , index) => {
           return(
             <Link to={`/desc/${index}`}>

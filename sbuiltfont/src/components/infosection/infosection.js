@@ -14,7 +14,16 @@ const InfoSection = ({ lightBg, imgStart, lightTopLine, lightText, lightTextDesc
                             <InfoColumn>
                                 <TextWrapper>
                                     <Topline lightTopLine={lightTopLine}>{topline}</Topline>
-                                    <Heading lightText={lightText}>{headline}</Heading>
+                                    <Heading lightText={lightText}>{headline.split('<br/>').map((item,index) => {
+                                        let arr2 = []
+                                        if(index != 0){
+                                            arr2.push(<br />)
+                                        }
+                                        arr2.push(item)
+                                        return(
+                                            arr2
+                                        )
+                                    })}</Heading>
                                     <Subtitle lightTextDesc={lightTextDesc}>{description}</Subtitle>
                                     <Link to={buttonlink} style={{ display: buttonshow }}>
                                         <Button primary={primary} Big fontBig>{buttonLabel}</Button>

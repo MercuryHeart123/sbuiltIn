@@ -54,9 +54,9 @@ letter-spacing:1.4px;
 margin-bottom:16px;
 `
 
-export const Heading = styled.h1`
+export const Heading = styled.div`
 margin-bottom:24px;
-font-size:48px;
+font-size:2.9vw;
 line-height:1.1;
 color:${({ lightText }) => (lightText ? '#f7f8fa' : '#1c2237')};
 `

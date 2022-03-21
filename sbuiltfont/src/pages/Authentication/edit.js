@@ -137,15 +137,15 @@ const Edit = () => {
 
   const onSubmitModel = async (e) => {
     e.preventDefault();
-    // const result = await createItem(item);
-    // setItems([...items, result]);
+    const result = await createItem(item);
+    setItems([...items, result]);
     // window.location.reload(false);
   }
 
   const onSubmitCatalog = async (e) => {
     e.preventDefault();
-    // const result = await createItem(item);
-    // setItems([...items, result]);
+    const result = await createItem(item);
+    setItems([...items, result]);
     // window.location.reload(false);
   }
 

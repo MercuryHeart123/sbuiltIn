@@ -6,7 +6,7 @@ import { AiTwotoneHome } from 'react-icons/ai'
 
 export const FooterContainer = styled.div`
 background:#FA6F6F;
-padding:0.5rem 0 0.9rem 0;
+/* padding:0.2rem 0 0.9rem 0; */
 display:flex;
 flex-direction:column;
 justify-content:center;
@@ -129,6 +129,7 @@ export const SocialLogo = styled(Link)`
 export const SocialIcon = styled(AiTwotoneHome)`
     margin-right:10px;
     font-size:26px;
+    margin-bottom:15px ;
 `
 
 export const WebsiteRight = styled.small`

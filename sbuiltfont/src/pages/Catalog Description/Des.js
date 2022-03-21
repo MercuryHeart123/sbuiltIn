@@ -49,6 +49,7 @@ const Desc = () => {
           key: '4',
           src: 'https://cdn.pixabay.com/photo/2015/10/12/15/46/fallow-deer-984573_960_720.jpg'
         },
+        
       ];
     
     for (let i = 0 ; i < images.length; i++){
@@ -74,6 +75,15 @@ const Desc = () => {
                 </Column>
         </div>
 
+        <div style={{marginBottom:'27px',padding:'0px 80px'}}>
+            <StackGrid columnWidth={180} duration={450} monitorImagesLoaded={true} style={{cursor:'zoom-in'}}>
+                {images.map((img , index) => {
+                return(
+                    <div key = {`${index}`}><img style = {style.Imgstyle} src = {img.src}></img></div>
+                )
+                })}
+            </StackGrid>
+        </div>
         <div style={{marginBottom:'27px'}}>
             <StackGrid columnWidth={180} duration={450} monitorImagesLoaded={true} style={{cursor:'zoom-in'}}>
                 {images.map((img , index) => {

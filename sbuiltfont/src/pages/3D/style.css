@@ -15,13 +15,12 @@ canvas {
   border-radius: 15px;
   cursor: pointer;
 }
-.ItemList{
+.ItemList {
   overflow-y: scroll;
   overflow-y: overlay;
   max-height: 35vh;
 }
 .ItemList::-webkit-scrollbar {
-  
   width: 10px;
 }
 .ItemList::-webkit-scrollbar-track {
@@ -29,7 +28,7 @@ canvas {
   border-radius: 10px;
 }
 .ItemList::-webkit-scrollbar-thumb {
-  background: #FF5757;
+  background: #ff5757;
   border-radius: 10px;
 }
 
@@ -41,4 +40,27 @@ canvas {
 .ItemList::-webkit-scrollbar-thumb:active {
   background: #ff6b48;
   border-radius: 10px;
+}
+
+.Backbtn {
+  border: 2px solid #fa6f6f;
+  border-radius: 30px;
+  width: 50px;
+  margin: 25px 0 0 25px;
+  cursor: pointer;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  padding: 0px 2px 2px 0;
+  font-size: 17px;
+  font-weight: 300;
+  color: black;
+  position: absolute;
+  z-index: 500;
+}
+
+.Backbtn:hover {
+  background: #fa6f6f;
+  transform: scale(1.1);
+  transition: 25ms;
 }

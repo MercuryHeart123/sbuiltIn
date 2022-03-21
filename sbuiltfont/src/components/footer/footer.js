@@ -56,7 +56,7 @@ const Footer = () => {
                 <SocialMedia>
                     <SocialMediaWrap>
                         <SocialLogo to='/'>
-                            <img src={mainLogo} style={{ width: '50px', borderRadius: '10px' }} alt='' />
+                            <img src={mainLogo} style={{ width: '95px', borderRadius: '10px'}} alt='' />
                         </SocialLogo>
 
                         <SocialIcons>
@@ -75,6 +75,9 @@ const Footer = () => {
                         </SocialIcons>
                     </SocialMediaWrap>
                 </SocialMedia>
+                <div style={{textAlign:'center',borderBottom:'1px solid black',marginBottom:'15px',fontSize:'14px'}}>
+                Copyright © 2022 Sbuilt. All right reserved
+                </div>
             </FooterContainer>
         </div>
     )
