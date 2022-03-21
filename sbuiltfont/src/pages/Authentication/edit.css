@@ -12,9 +12,21 @@
     border-radius: 20px;
     padding: 10px;
     position: static;
+    animation: fadein 1s;
 }  
 
 .flex-child:first-child {
     margin-right: 20px;
     position: static;
-} 
+    animation: fadein 1s;
+}
+
+@keyframes fadein {
+    from {
+      opacity: 0;
+    }
+  
+    to{
+      opacity: 1;
+    }
+}
