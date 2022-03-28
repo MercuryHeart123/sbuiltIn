@@ -145,10 +145,6 @@ const Edit = () => {
 
   const onSubmitCatalog = async (e) => {
     e.preventDefault();
-    let today = new Date();
-    var date = String(today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear());
-    var time = String(today.getHours() + ":" + today.getMinutes());
-    setItem({ ...item, modifiedDate: `${date}@${time}`});
     const result = await createItem(item);
     setItems([...items, result]);
     listAllModel("listcatalog");
