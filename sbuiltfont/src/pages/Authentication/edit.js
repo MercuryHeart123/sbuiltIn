@@ -5,7 +5,7 @@ import './edit.css';
 
 const Edit = () => {
 
-  const [item, setItem] = useState({ name: '', detail: '', dimension: '', price: '', place: '', image: [], full64: [], AllPost: [], AllModel: [], model: false, modifiedDate: '' });
+  const [item, setItem] = useState({ name: '', detail: '', dimension: '', price: '', place: '', image: [], full64: [], AllPost: [], AllModel: [], model: false });
   const [items, setItems] = useState([]);
   const [display, setDisplay] = useState("catalog");
   const [allModel, setallModel] = useState([]);
