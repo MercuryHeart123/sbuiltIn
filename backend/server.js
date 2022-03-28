@@ -10,7 +10,7 @@ const MongoStore = require("connect-mongo");
 const { MongoClient } = require("mongodb");
 const { v4: uuidv4 } = require("uuid");
 
-const uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}:${process.env.DB_PORT}`;
+const uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}:${process.env.DB_PORT}/sbuiltin`;
 
 let port = process.env.PORT || 8080
 
@@ -99,7 +99,7 @@ app.post("/logout", checkAuth, (req, res) => {
 app.get("/listmodel", async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
-    let result = await client.db("sbuiltin").collection("model").find({}, { projection: { _id: 0, title: 1, about: 1, dimension: 1, price: 1, pathimg: 1} }).toArray();
+    let result = await client.db("sbuiltin").collection("model").find({}, { projection: { _id: 0, title: 1, about: 1, dimension: 1, price: 1, pathimg: 1, dateModified: 1} }).toArray();
     console.log("Hello from get listmodel");
     // console.log(result);
     res.send(result);
@@ -108,7 +108,7 @@ app.get("/listmodel", async (req, res) => {
 app.get("/listcatalog", async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
-    let result = await client.db("sbuiltin").collection("catalog").find({}, { projection: { _id: 0, title: 1, about: 1, place: 1, pathimg: 1} }).toArray();
+    let result = await client.db("sbuiltin").collection("catalog").find({}, { projection: { _id: 0, title: 1, about: 1, place: 1, pathimg: 1, dateModified: 1} }).toArray();
     console.log("Hello from get listcatalog");
     res.send(result);
 })
@@ -140,6 +140,11 @@ app.post("/edit", async (req, res) => {
     var image = req.body.image;
     var dimension = req.body.dimension;
     var place = req.body.place;
+    let today = new Date();
+    var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+    var time = today.getHours() + ":" + today.getMinutes();
+    var serverDate = `${date}@${time}`;
+    console.log(date);
     // const { uid } = req.body;
 
     console.log("this is model check = " + chkmodel);
@@ -171,6 +176,7 @@ app.post("/edit", async (req, res) => {
             dimension: dimension,
             pathimg: path,
             uid: imgUid,
+            dateModified: serverDate,
             isModel: chkmodel
         }
         const client = new MongoClient(uri);
@@ -224,6 +230,7 @@ app.post("/edit", async (req, res) => {
             place: place,
             pathimg: path,
             uid: imgUid,
+            dateModified: serverDate
         }
         console.log(imgPath);
         const client = new MongoClient(uri);

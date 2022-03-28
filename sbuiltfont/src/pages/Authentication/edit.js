@@ -5,7 +5,7 @@ import './edit.css';
 
 const Edit = () => {
 
-  const [item, setItem] = useState({ name: '', detail: '', dimension: '', price: '', place: '', image: [], full64: [], AllPost: [], AllModel: [], model: false });
+  const [item, setItem] = useState({ name: '', detail: '', dimension: '', price: '', place: '', image: [], full64: [], AllPost: [], AllModel: [], model: false, modifiedDate: '' });
   const [items, setItems] = useState([]);
   const [display, setDisplay] = useState("catalog");
   const [allModel, setallModel] = useState([]);
@@ -137,15 +137,25 @@ const Edit = () => {
 
   const onSubmitModel = async (e) => {
     e.preventDefault();
+    let today = new Date();
+    var date = String(today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear());
+    var time = String(today.getHours() + ":" + today.getMinutes());
+    setItem({ ...item, modifiedDate: `${date}@${time}`});
     const result = await createItem(item);
     setItems([...items, result]);
+    listAllModel("listmodel");
     // window.location.reload(false);
   }
 
   const onSubmitCatalog = async (e) => {
     e.preventDefault();
+    let today = new Date();
+    var date = String(today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear());
+    var time = String(today.getHours() + ":" + today.getMinutes());
+    setItem({ ...item, modifiedDate: `${date}@${time}`});
     const result = await createItem(item);
     setItems([...items, result]);
+    listAllModel("listcatalog");
     // window.location.reload(false);
   }
 
@@ -214,23 +224,24 @@ const Edit = () => {
             <br />
 
             <input required type="text" id="name" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }}
-
-              onChange={e => setItem({ ...item, name: e.target.value })}
+              onInput={e => setItem({ ...item, name: e.target.value })}
             />
             <br />
             <label for="detail">&nbsp; Enter detail (รายละเอียด)</label>
             <br />
             <input required type="text" id="detail" className="form-control" placeholder="Enter detail" style={{ borderColor: "black", borderRadius: "5px" }}
 
-              onChange={e => setItem({ ...item, detail: e.target.value })}
+              onInput={e => setItem({ ...item, detail: e.target.value })}
             />
+            {console.log(item.detail)}
             <br />
             <label for="place">&nbsp; Place (สถานที่)</label>
             <br />
             <input required type="text" id="place" className="form-control" placeholder="Enter place" style={{ borderColor: "black", borderRadius: "5px" }}
 
-              onChange={e => setItem({ ...item, place: e.target.value })}
+              onInput={e => setItem({ ...item, place: e.target.value })}
             />
+            {console.log(item.place)}
             <input
               required
               class="form-control"
@@ -250,9 +261,9 @@ const Edit = () => {
 
             </div>
           </form>
-          <button className="btn btn-primary btn-block" id="load-model" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} onClick={() => {
+          {/* <button className="btn btn-primary btn-block" id="load-model" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} onClick={() => {
             listAllModel("listcatalog")
-          }}>Load catalog data</button>
+          }}>Load catalog data</button> */}
 
 
 
@@ -264,7 +275,7 @@ const Edit = () => {
             <br />
             <input required type="text" id="name" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }}
 
-              onChange={e => {
+              onInput={e => {
                 setItem({ ...item, name: e.target.value, model: true })
 
               }}
@@ -274,21 +285,21 @@ const Edit = () => {
             <br />
             <input required type="text" id="detail" className="form-control" placeholder="Enter detail" style={{ borderColor: "black", borderRadius: "5px" }}
 
-              onChange={e => setItem({ ...item, detail: e.target.value })}
+              onInput={e => setItem({ ...item, detail: e.target.value })}
             />
             <br />
             <label for="price">&nbsp; Enter price (ราคา)</label>
             <br />
             <input required type="text" id="price" className="form-control" placeholder="Enter price" style={{ borderColor: "black", borderRadius: "5px" }}
 
-              onChange={e => setItem({ ...item, price: e.target.value })}
+              onInput={e => setItem({ ...item, price: e.target.value })}
             />
             <br />
             <label for="dimension">&nbsp; Dimension (ขนาด)</label>
             <br />
             <input required type="text" id="dimension" className="form-control" placeholder="Enter dimension" style={{ borderColor: "black", borderRadius: "5px" }}
 
-              onChange={e => setItem({ ...item, dimension: e.target.value })}
+              onInput={e => setItem({ ...item, dimension: e.target.value })}
             />
             <input
               required
@@ -322,13 +333,17 @@ const Edit = () => {
               <button type="reset" className="btn btn-primary btn-block" value="Reset" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red", marginLeft: "10px" }}>Reset form</button>
             </div>
           </form>
-          <button className="btn btn-primary btn-block" id="load-model" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} onClick={() => {
+          {/* <button className="btn btn-primary btn-block" id="load-model" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} onClick={() => {
             listAllModel("listmodel")
-          }}>Load model data</button>
+          }}>Load model data</button> */}
           <div>
             {allModel ? allModel.map((model, index) => {
               return (
-                <div>{model.title}</div>)
+                <div>
+                <a href={`${url}/${model.title}`}>{model.title} {model.dateModified}</a>
+                <br/>
+                {console.log(model.dateModified)}
+                </div>)
             }) : null}
           </div>
 
