@@ -6,29 +6,8 @@ import * as THREE from "three"
 
 
 
-const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllModel, allModel, currentCamera, currentScene }) => {
+const CreateMenu = ({ setGroupModel, groupModel, setShowMenu, dummyModel, setAllModel, allModel, currentCamera, currentScene }) => {
 
-    const checkIsIsolate = (removeIndex) => {
-        if (objGroup[removeIndex.parentIndex].length > 1) {
-            return false
-        }
-        return true
-
-    }
-
-    const searchByUuid = (uuid) => {
-        for (let i = 0; i < objGroup.length; i++) {
-            let finding = objGroup[i]
-            let index = finding.indexOf(uuid)
-
-            if (index > -1) {
-                return {
-                    parentIndex: i,
-                    selfIndex: index
-                }
-            }
-        }
-    }
 
     function intersect(pos, camera, scene) {
         const raycaster = new THREE.Raycaster(); // create once
@@ -82,10 +61,19 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
                                 item.startPosition = target
                                 item.showDetail = true
                                 item.customize = []
+                                let connection = {
+                                    modelUuid: item.modelUuid,
+                                    modelWidth: item.modelWidth,
+                                    left: false,
+                                    right: false,
+                                    create: true
+                                }
                                 if (!allModel) {
+                                    setGroupModel([connection])
                                     setAllModel([item])
                                 }
                                 else {
+                                    setGroupModel([...groupModel, connection])
                                     setAllModel([...allModel, item])
                                 }
                             }
@@ -184,14 +172,22 @@ const CreateMenu = ({ setObjGroup, objGroup, setShowMenu, dummyModel, setAllMode
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => {
                                                 allModel[index].create = false
-                                                let removeIndex = searchByUuid(item.modelUuid)
-                                                if (checkIsIsolate(removeIndex)) {
-                                                    objGroup.splice(removeIndex.parentIndex, 1)
+                                                for (let i = 0; i < groupModel.length; i++) {
+                                                    if (index == i) {
+                                                        continue
+                                                    }
+                                                    if (groupModel[i].left == groupModel[index].modelUuid) {
+                                                        groupModel[i].left = false
+                                                        groupModel[index].right = false
+                                                        continue
+                                                    }
+                                                    if (groupModel[i].right == groupModel[index].modelUuid) {
+                                                        groupModel[i].right = false
+                                                        groupModel[index].left = false
+                                                    }
                                                 }
-                                                else {
-                                                    objGroup[removeIndex.parentIndex].splice(removeIndex.selfIndex, 1)
-                                                }
-                                                setObjGroup([...objGroup])
+                                                groupModel[index].create = false
+                                                setGroupModel([...groupModel])
                                                 setAllModel([...allModel])
                                             }} />
                                     </span>

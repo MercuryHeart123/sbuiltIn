@@ -18,47 +18,52 @@ const ThreeD = () => {
     const [isDrag, setIsDrag] = useState(false)
     const [planeD, setPlaneD] = useState({ x: 5, y: 1, z: 5 })
     const [currentObj, setObj] = useState()
-    const [objGroup, setObjGroup] = useState([])
     const [lookAt, setLookAt] = useState([0, 0, 0])
-    const [activeWall, setActiveWall] = useState(false)
     const [showMenu, setShowMenu] = useState(true)
     const [allModel, setAllModel] = useState()
+    const [groupModel, setGroupModel] = useState()
     const [currentCamera, setCurrentCamera] = useState()
     const [currentScene, setCurrentScene] = useState()
 
     const dummyModel = [{
         title: '50x240',
         modelName: '50cm',
+        modelWidth: 0.5,
         modelPath: 'model/50cm.gltf',
         previewPath: 'model/wardrobe_0.5m.png'
     },
     {
         title: '70x240',
         modelName: '70cm',
+        modelWidth: 0.7,
         modelPath: 'model/70cm.gltf',
         previewPath: 'model/wardrobe_0.75m.png'
     },
     {
         title: '100x240',
         modelName: '100cm',
+        modelWidth: 1,
         modelPath: 'model/100cm.gltf',
         previewPath: 'model/wardrobe_1m.png'
     },
     {
         title: '100x240',
         modelName: '100cm',
+        modelWidth: 1,
         modelPath: 'model/100cm.gltf',
         previewPath: 'model/wardrobe_1m.png'
     },
     {
         title: '100x240',
         modelName: '100cm',
+        modelWidth: 1,
         modelPath: 'model/100cm.gltf',
         previewPath: 'model/wardrobe_1m.png'
     },
     {
         title: '100x240',
         modelName: '100cm',
+        modelWidth: 1,
         modelPath: 'model/100cm.gltf',
         previewPath: 'model/wardrobe_1m.png'
     },
@@ -73,17 +78,15 @@ const ThreeD = () => {
                     modelUuid={`${item.modelUuid}`}
                     modelPath={`${item.modelPath}`}
                     modelName={`${item.modelName}`}
-                    setAllModel={setAllModel}
-                    customize={item.customize}
                     startPosition={item.startPosition}
+                    customize={item.customize}
                     dimension={planeD}
                     setIsDrag={setIsDrag}
-                    plane={floorPlane}
                     currentObj={currentObj}
                     setObj={setObj}
                     setLookAt={setLookAt}
-                    objGroup={objGroup}
-                    setObjGroup={setObjGroup}
+                    groupModel={groupModel}
+                    setGroupModel={setGroupModel}
                     key={index}
                 />)
             }
@@ -91,17 +94,13 @@ const ThreeD = () => {
 
         })
     }
-    const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-    const createWall = [0, 0, 0, 0].map((item, index) => {
-        return <Wall angle={angle} dimension={planeD} face={index} />
-    })
 
     return (
         <div>
             <Link to='/' >
-            <div className="Backbtn">
-                <IoChevronBack />
-            </div>
+                <div className="Backbtn">
+                    <IoChevronBack />
+                </div>
             </Link>
             <div style={{
                 display: 'flex',
@@ -114,7 +113,7 @@ const ThreeD = () => {
                     setLookAt([0, 0, 0])
                 }
             }>Wall</button> */}
-                {!showMenu && <fi.FiMenu style={{
+                {!showMenu && !currentObj && <fi.FiMenu style={{
                     display: 'flex',
                     flexDirection: 'column',
                     position: "fixed",
@@ -127,9 +126,9 @@ const ThreeD = () => {
                 }} onClick={() => {
                     setShowMenu(true)
                 }} />}
-                {showMenu && !currentObj && <CreateMenu
-                    objGroup={objGroup}
-                    setObjGroup={setObjGroup}
+                {showMenu && <CreateMenu
+                    groupModel={groupModel}
+                    setGroupModel={setGroupModel}
                     allModel={allModel}
                     setAllModel={setAllModel}
                     setShowMenu={setShowMenu}
@@ -177,7 +176,7 @@ const ThreeD = () => {
                             <spotLight position={[0, 5, 10]} />
                             {/* <Box /> */}
                             {allModel && createAllModel()}
-                            {activeWall && createWall}
+
 
                         </Canvas>
                     </div>

@@ -23,10 +23,7 @@ const Control = ({ type, setAngle, lookAt, setCurrentCamera, setCurrentScene }) 
     setCurrentCamera(camera)
     setCurrentScene(scene)
     useFrame(() => {
-        var vector = new THREE.Vector3(0, 0, -1);
-        let v = camera.getWorldDirection(vector)
-        let theta = Math.atan2(v.x, v.z);
-        setAngle(theta)
+
         if (
             orbitRef.current.target.x !== lookAt[0]
         ) {

@@ -93,6 +93,10 @@ const Inside = ({ parentUuid, modelUuid, currentObj, setCanMove, parentModelSize
             dracoLoader.setDecoderPath('three/examples/js/libs/draco/');
             loader.setDRACOLoader(dracoLoader);
             loader.load(`${modelPath}`, async function (gltf) {
+                gltf.scene.traverse((obj) => {
+                    obj.userData.name = modelUuid
+                    obj.userData.isCustomize = true
+                })
                 var box = new THREE.Box3().setFromObject(gltf.scene);
                 box.center(gltf.scene.position); // this re-sets the mesh position
                 gltf.scene.position.multiplyScalar(- 1)
