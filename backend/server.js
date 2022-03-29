@@ -101,7 +101,6 @@ app.get("/listmodel", async (req, res) => {
     await client.connect();
     let result = await client.db("sbuiltin").collection("model").find({}, { projection: { _id: 0, title: 1, about: 1, dimension: 1, price: 1, pathimg: 1, dateModified: 1} }).toArray();
     console.log("Hello from get listmodel");
-    // console.log(result);
     res.send(result);
 })
 
@@ -113,106 +112,27 @@ app.get("/listcatalog", async (req, res) => {
     res.send(result);
 })
 
-app.get("/edit", async (req, res) => {
-    // const { title, image64 } = req.body;
-    // let query = { title, image64 };
-    const client = new MongoClient(uri);
-    await client.connect();
-    const database = client.db("sbuiltin");
-    const catalog = database.collection("catalog");
-    const model = database.collection("model");
-    try {
-        let info = await model.find();
-        let info2 = await catalog.find();
-        res.send(JSON.stringify(info));
-        console.log("Hello from get edit");
-    } catch (error) {
-        res.status(404).json({ message: error.message });
-
-    }
-})
-
-app.post("/edit", async (req, res) => {
-    var name = req.body.name;
-    var detail = req.body.detail;
-    var price = req.body.price;
-    var chkmodel = req.body.model;
-    var image = req.body.image;
-    var dimension = req.body.dimension;
-    var place = req.body.place;
+app.post("/editcatalog", async (req, res) => {
+    const { namecat, detailcat, placecat, image } = req.body;
+    let query = { namecat, detailcat, placecat, image };
+    // var name = req.body.name;
+    // var detail = req.body.detail;
+    // var image = req.body.image;
+    // var place = req.body.place;
     let today = new Date();
     var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
     var time = today.getHours() + ":" + today.getMinutes();
     var serverDate = `${date}@${time}`;
     console.log(date);
-    // const { uid } = req.body;
-
-    console.log("this is model check = " + chkmodel);
-    if (chkmodel === true) {
-        let path = [];
-        let imgUid = uuidv4();
-        fs.mkdirSync(`./model/${imgUid}`, { recursive: true });
-        let rootPath = `./model/${imgUid}`;
-        let imgPath;
-        console.log(name);
-        for (let i = 0; i < image.length; i++) {
-            imgUid = uuidv4();
-            let base64Image = image[i].split(";base64,").pop();
-            imgPath = rootPath + `/${imgUid}.gltf`;
-            path.push(imgPath);
-            fs.writeFile(
-                imgPath,
-                base64Image,
-                { encoding: "base64" },
-                function (err) {
-                    console.log(`gltf created`);
-                }
-            );
-        }
-        var model = {
-            title: name,
-            about: detail,
-            price: price,
-            dimension: dimension,
-            pathimg: path,
-            uid: imgUid,
-            dateModified: serverDate,
-            isModel: chkmodel
-        }
-        const client = new MongoClient(uri);
-        await client.connect();
-        let info = await client.db("sbuiltin").collection("model").insertOne(model);
-        if (info) {
-            console.log("Data inserted");
-            let JSONdata = JSON.stringify({
-                status: "Completed",
-                msg: "Upload completed!",
-            });
-            client.close();
-            res.status(200).end(JSONdata);
-            console.log(JSONdata);
-        }
-        else {
-            console.log("Error");
-            let JSONdata = JSON.stringify({
-                status: "Failed",
-                msg: "Error! Cannot connect to database.",
-            });
-            client.close();
-            res.status(401).end(JSONdata);
-            console.log(JSONdata);
-        }
-    }
-    else {
-        let path = [];
+    console.log("Hello from post editcatalog");
+    let path = [];
         let imgUid = uuidv4();
         fs.mkdirSync(`./catalog/${imgUid}`, { recursive: true });
         let rootPath = `./catalog/${imgUid}`;
         let imgPath;
-        // console.log(image);
-        for (let i = 0; i < image.length; i++) {
+        for (let i = 0; i < query.image.length; i++) {
             imgUid = uuidv4();
-            let base64Image = image[i].split(";base64,").pop();
+            let base64Image = query.image[i].split(";base64,").pop();
             imgPath = rootPath + `/${imgUid}.jpg`;
             path.push(imgPath);
             fs.writeFile(
@@ -225,9 +145,9 @@ app.post("/edit", async (req, res) => {
             );
         }
         var cat = {
-            title: name,
-            about: detail,
-            place: place,
+            title: query.namecat,
+            about: query.detailcat,
+            place: query.placecat,
             pathimg: path,
             uid: imgUid,
             dateModified: serverDate
@@ -256,7 +176,78 @@ app.post("/edit", async (req, res) => {
             res.status(401).end(JSONdata);
             console.log(JSONdata);
         }
+})
 
+app.post("/editmodel", async (req, res) => {
+    const { namemodel, detailmodel, pricemodel, dimensionmodel, image } = req.body;
+    let query = { namemodel, detailmodel, pricemodel, dimensionmodel, image };
+    // var name = req.body.name;
+    // var detail = req.body.detail;
+    // var price = req.body.price;
+    // var chkmodel = req.body.model;
+    // var image = req.body.image;
+    // var dimension = req.body.dimension;
+    let today = new Date();
+    var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+    var time = today.getHours() + ":" + today.getMinutes();
+    var serverDate = `${date}@${time}`;
+    console.log(date);
+    console.log("Hello from post editmodel");
+    // const { uid } = req.body;
+
+    // console.log("this is model check = " + chkmodel);
+    let path = [];
+    let imgUid = uuidv4();
+    fs.mkdirSync(`./model/${imgUid}`, { recursive: true });
+    let rootPath = `./model/${imgUid}`;
+    let imgPath;
+    // console.log(name);
+    for (let i = 0; i < query.image.length; i++) {
+        imgUid = uuidv4();
+        let base64Image = query.image[i].split(";base64,").pop();
+        imgPath = rootPath + `/${imgUid}.gltf`;
+        path.push(imgPath);
+        fs.writeFile(
+            imgPath,
+            base64Image,
+            { encoding: "base64" },
+            function (err) {
+                console.log(`gltf created`);
+            }
+        );
+    }
+    var model = {
+        title: query.namemodel,
+        about: query.detailmodel,
+        price: query.pricemodel,
+        dimension: query.dimensionmodel,
+        pathimg: path,
+        uid: imgUid,
+        dateModified: serverDate,
+        // isModel: chkmodel
+    }
+    const client = new MongoClient(uri);
+    await client.connect();
+    let info = await client.db("sbuiltin").collection("model").insertOne(model);
+    if (info) {
+        console.log("Data inserted");
+        let JSONdata = JSON.stringify({
+            status: "Completed",
+            msg: "Upload completed!",
+        });
+        client.close();
+        res.status(200).end(JSONdata);
+        console.log(JSONdata);
+    }
+    else {
+        console.log("Error");
+        let JSONdata = JSON.stringify({
+            status: "Failed",
+            msg: "Error! Cannot connect to database.",
+        });
+        client.close();
+        res.status(401).end(JSONdata);
+        console.log(JSONdata);
     }
 });
 
