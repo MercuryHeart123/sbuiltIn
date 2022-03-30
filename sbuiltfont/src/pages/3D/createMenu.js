@@ -169,7 +169,7 @@ const CreateMenu = ({ setGroupModel, groupModel, setShowMenu, dummyModel, setAll
                                             />)}
 
                                         <ri.RiCloseFill
-                                            style={{ cursor: 'pointer' }}
+                                            style={{ marginRight: '20px', cursor: 'pointer' }}
                                             onClick={() => {
                                                 allModel[index].create = false
                                                 for (let i = 0; i < groupModel.length; i++) {

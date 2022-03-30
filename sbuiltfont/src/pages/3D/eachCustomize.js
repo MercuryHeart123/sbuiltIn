@@ -149,7 +149,7 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
             background: '#F1EDED',
             minWidth: '25vw',
             minHeight: '80vh',
-            maxHeight: '80vh',
+
             maxWidth: '25vw',
             border: '1px solid #DCDCDC',
             borderRadius: '18px',
@@ -197,7 +197,7 @@ const EachCustomize = ({ setObj, currentObj, setLookAt, allModel, setAllModel, c
                                     </span>
                                     <span>
                                         <ri.RiCloseFill
-                                            style={{ cursor: 'pointer' }}
+                                            style={{ marginRight: '20px', cursor: 'pointer' }}
                                             onClick={() => {
                                                 thisCustom[index].create = false
                                                 setThisCustom([...thisCustom])

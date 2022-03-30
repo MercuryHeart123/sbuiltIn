@@ -5,7 +5,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { animated, useSpring } from "@react-spring/three";
 
 extend({ OrbitControls })
-const Control = ({ type, setAngle, lookAt, setCurrentCamera, setCurrentScene }) => {
+const Control = ({ type, lookAt, setCurrentCamera, setCurrentScene }) => {
     const orbitRef = useRef(null);
     const { camera, gl, scene } = useThree()
 

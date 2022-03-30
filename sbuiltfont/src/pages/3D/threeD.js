@@ -5,16 +5,13 @@ import './style.css'
 import Plane from './plane'
 import Control from './control'
 import ImportModel from './importmodel'
-import Wall from './wall'
 import * as fi from 'react-icons/fi'
 import { Link } from 'react-router-dom';
 import CreateMenu from './createMenu'
 import EachCustomize from './eachCustomize'
-import Box from './box'
 import { IoChevronBack } from 'react-icons/io5';
 
 const ThreeD = () => {
-    const [angle, setAngle] = useState(0)
     const [isDrag, setIsDrag] = useState(false)
     const [planeD, setPlaneD] = useState({ x: 5, y: 1, z: 5 })
     const [currentObj, setObj] = useState()
@@ -126,7 +123,7 @@ const ThreeD = () => {
                 }} onClick={() => {
                     setShowMenu(true)
                 }} />}
-                {showMenu && <CreateMenu
+                {showMenu && !currentObj && <CreateMenu
                     groupModel={groupModel}
                     setGroupModel={setGroupModel}
                     allModel={allModel}
@@ -159,7 +156,6 @@ const ThreeD = () => {
                             shadowMap
                             style={{ zIndex: '0' }}>
                             <Control
-                                setAngle={setAngle}
                                 type={isDrag}
                                 lookAt={lookAt}
                                 setCurrentCamera={setCurrentCamera}
