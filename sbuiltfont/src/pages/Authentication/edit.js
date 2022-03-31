@@ -1,35 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../../../node_modules/bootstrap/dist/css/bootstrap.min.css';
-import './edit.css';
+import './style.edit.css';
+import { v4 as uuidv4 } from 'uuid';
+import { NavLink as Link } from "react-router-dom";
+import Popup from './popup';
 
 const Edit = () => {
 
-  const [item, setItem] = useState({ name: '', detail: '', dimension: '', price: '', place: '', image: [], full64: [], AllPost: [], AllModel: [], model: false });
+  const [item, setItem] = useState({ image: [], imagePreview: [], imageAddon: null, full64: [], fullPreview: [], fullAddon: null });
   // const [items, setItems] = useState([]);
   const [display, setDisplay] = useState("catalog");
   const [allData, setallData] = useState([]);
+  const [allImg, setallImg] = useState([]);
+  const [img64, setimg64] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [chkAddon, setchkAddon] = useState("");
 
   const url = `${process.env.REACT_APP_IP}:${process.env.REACT_APP_PORT}`;
-
-  // const listDataModel = (e) => {
-  //   e.preventDefault();
-
-  //   // axios.defaults.withCredentials = true;
-  //   // const urldata = url+"/listmodel";
-  //   // axios.get(urldata)
-  //   //   .then((res) => {
-  //   //     let response = res.data;
-  //   //     setItem({ ...item, AllModel: response });
-  //   //     console.log(response);
-  //   //     console.log("Data has been received");
-  //   //   })
-  //   //   .catch((err) => {
-  //   //     alert(err.response.data.msg);
-  //   //     console.log("Error: either server or database is down!");
-  //   //   })
-
-  // }
 
   const listAllData = (type) => {
     console.log("hello");
@@ -48,32 +36,6 @@ const Edit = () => {
         console.log("Error: either server or database is down!");
       })
   }
-
-  // const displayCatalog = (AllPost) => {
-  //   if (!AllPost.length) {
-  //     return null;
-  //   }
-
-  //   return AllPost.map((post, index) => (
-  //     <div key={index} style={{ marginTop: "10px" }}>
-  //       <h5>{post.title} &nbsp; {post.about} &nbsp; {post.place}</h5>
-  //       <img src={post.pathimg}></img>
-  //     </div>
-  //   ));
-  // };
-
-  // const displayModel = (AllModel) => {
-  //   if (!AllModel.length) {
-  //     return null;
-  //   }
-
-  //   return AllModel.map((post, index) => (
-  //     <div key={index} style={{ marginTop: "10px" }}>
-  //       <h5>{post.title} &nbsp; {post.about} &nbsp; {post.dimension}</h5>
-  //       <img src={post.pathimg}></img>
-  //     </div>
-  //   ));
-  // };
 
   const selectFiles = (e) => {
     let imgdata = item.full64;
@@ -95,56 +57,47 @@ const Edit = () => {
     reader.readAsDataURL(img);
   }
 
-  // const getItems = async () => {
-  //   try {
-  //     const { data } = await axios.get(url + "/edit");
-  //     return data
-  //   } catch (error) {
-  //     console.log(error);
-  //     console.log(url + "/edit");
-      
-  //   }
-  // }
+  const selectPreview = (e) => {
+    let imgdata = item.fullPreview;
+    for (let i = 0; i < e.length; i++) {
+      parsePreview(e[`${i}`]);
+      imgdata.push(e[`${i}`]);
+    }
+    setItem({ ...item, fullPreview: imgdata });
+  }
 
-  // const createItem = async (todo) => {
-  //   try {
-  //     const { data } = await axios.post(url + "/edit", todo);
-  //     alert("Complete: data has been uploaded!");
-  //     console.log(data);
-  //     return data
-  //   } catch (error) {
-  //     console.log(error);
-  //     alert("Failed: client and server are out of sync!");
-  //   }
-  // }
+  const parsePreview = (img) => {
+    let reader = new FileReader();
+    reader.onload = (e) => {
+      let list = item.imagePreview;
+      list.push(e.target.result);
+      setItem({ ...item, imagePreview: list });
+      console.log(list);
+    };
+    reader.readAsDataURL(img);
+  }
 
-  // const onSubmitModel = async (e) => {
-  //   e.preventDefault();
-  //   let namemodel = e.target.namemodel.value;
-  //   let detailmodel = e.target.detailmodel.value;
-  //   let pricemodel = e.target.pricemodel.value;
-  //   let dimensionmodel = e.target.dimensionmodel.value;
-  //   setItem({ ...item, name: namemodel, detail: detailmodel, price: pricemodel, dimension: dimensionmodel });
-  //   const result = await createItem(item);
-  //   setItems([...items, result]);
-  //   listAllData("listmodel");
-  // }
+  const selectAddon = (e) => {
+    let imgdata = [];
+    for (let i = 0; i < e.length; i++) {
+      parseAddon(e[`${i}`]);
+      imgdata.push(e[`${i}`]);
+    }
+    setItem({ ...item, fullAddon: imgdata });
+  }
 
-  // const onSubmitCatalog = async (e) => {
-  //   e.preventDefault();
-  //   let namecat = e.target.namecat.value;
-  //   let detailcat = e.target.detailcat.value;
-  //   let placecat = e.target.placecat.value;
-  //   console.log("1" + namecat);
-  //   console.log("2" + detailcat);
-  //   console.log("3" + placecat);
-  //   setItem({ ...item, name: namecat, detail: detailcat, place: placecat });
-  //   const result = await createItem(item);
-  //   setItems([...items, result]);
-  //   listAllData("listcatalog");
-  // }
+  const parseAddon = (img) => {
+    let reader = new FileReader();
+    reader.onload = (e) => {
+      let list = [];
+      list.push(e.target.result);
+      setItem({ ...item, imageAddon: list });
+      console.log(list);
+    };
+    reader.readAsDataURL(img);
+  }
 
-  const onSubmitHandler = async (type, e) => {
+  const onSubmitHandler = (type, e) => {
     e.preventDefault();
     console.log(type);
     const urldata = url + "/" + type;
@@ -153,33 +106,55 @@ const Edit = () => {
       let detailmodel = e.target.detailmodel.value;
       let pricemodel = e.target.pricemodel.value;
       let dimensionmodel = e.target.dimensionmodel.value;
+      let uid = uuidv4();
       let image = item.image;
-      const formData = { namemodel, detailmodel, pricemodel, dimensionmodel, image };
-      axios.post(urldata, formData)
-      .then(() => {
-        alert("Complete: data has been uploaded!");
-        listAllData("listmodel");
-    })
-      .catch((err) => {
+      let imagePreview = item.imagePreview;
+      let imageAddon;
+      if(imageAddon !== null) {
+        imageAddon = item.imageAddon;
+        const formData = { namemodel, detailmodel, pricemodel, dimensionmodel, image, imagePreview, imageAddon, uid };
+        axios.post(urldata, formData)
+        .then(() => {
+          alert("Complete: data has been uploaded!");
+          listAllData("listmodel");
+        })
+        .catch((err) => {
           alert("Failed: client and server are out of sync!");
           console.log(err.response.data.msg);
-      });
+
+        });
+      } else {
+        const formData = { namemodel, detailmodel, pricemodel, dimensionmodel, image, imagePreview, uid };
+        axios.post(urldata, formData)
+        .then(() => {
+          alert("Complete: data has been uploaded!");
+          listAllData("listmodel");
+        })
+        .catch((err) => {
+          alert("Failed: client and server are out of sync!");
+          console.log(err.response.data.msg);
+
+        });
+      }
+     
     } else if (type == "editcatalog") {
       let namecat = e.target.namecat.value;
       let detailcat = e.target.detailcat.value;
       let placecat = e.target.placecat.value;
       let image = item.image;
+      // let imagePreview = item.imagePreview; 
+      let uid = uuidv4();
       // setItem({ ...item, name: namecat, detail: detailcat, place: placecat });
-      const formData = { namecat, detailcat, placecat, image };
+      const formData = { namecat, detailcat, placecat, image, uid };
       axios.post(urldata, formData)
-      .then(() => {
+        .then(() => {
           alert("Complete: data has been uploaded!");
           listAllData("listcatalog");
-      })
-      .catch((err) => {
-          alert("Failed: client and server are out of sync!");
+        })
+        .catch((err) => {
+          alert("Failed: client and server are out of sync! Try reload this page");
           console.log(err.response.data.msg);
-      });
+        });
       // const result = await createItem(item);
       // setItems([...items, result]);
     }
@@ -199,6 +174,39 @@ const Edit = () => {
       setDisplay("model");
     }
 
+  }
+
+  const togglePopup = (uuid, title, path, e) => {
+    let uid = uuid;
+    let name = title;
+    const urldata = url + "/" + path;
+    console.log(uid);
+    const formData = { uid, name };
+    axios.post(urldata, formData)
+      .then((res) => {
+        let response = res.data;
+        setimg64(response);
+        console.log("Data from get catalog or model has been received");
+
+      })
+      .catch((err) => {
+        console.log(err);
+        console.log("Error: either server or database is down!");
+      })
+    setIsOpen(!isOpen);
+  }
+
+  const closePopup = () => {
+    setimg64("");
+    setIsOpen(false);
+  }
+
+  const toggleAddon = () => {
+    if (chkAddon !== "addon") {
+      setchkAddon("addon");
+    } else if (chkAddon === "addon") {
+      setchkAddon("");
+    }
   }
 
   useEffect(() => {
@@ -225,12 +233,23 @@ const Edit = () => {
 
       <div className="flex-container">
         {display == "catalog" && <div className="flex-child lightyellow" id="catalog" style={{ borderColor: "darkblue" }}>
-          <form action="" onSubmit={(e) => {onSubmitHandler("editcatalog", e)}}>
-            <u><h5>All post in catalog (รายการทั้งหมดของ catalog)</h5></u>
+          <form action="" onSubmit={(e) => { onSubmitHandler("editcatalog", e) }}>
+            <u><h5>All post in catalog (รายการทั้งหมดของแคตตาล้อก)</h5></u>
+            {isOpen && <Popup
+              content={<>
+                <b>Design your Popup</b>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                <img src={`data:image/jpg;base64,${img64}`} alt="placeholder" width="50px" height="50px"></img>
+              </>}
+              handleClose={closePopup}
+            />}
             <div>
               {allData ? allData.map((model, index) => {
                 return (
-                  <div>{model.title}</div>)
+                  <div>
+                    <Link to="/edit" onClick={(e) => { togglePopup(model.uid, model.title, "getcatalog", e) }}>{model.title} {model.dateModified}</Link>
+                    <br />
+                  </div>)
               }) : null}
             </div>
             <u><h5>To catalog (เพิ่มแคตตาล้อก)</h5></u>
@@ -248,31 +267,20 @@ const Edit = () => {
             <input required type="text" id="place-cat" name="placecat" className="form-control" placeholder="Enter place" style={{ borderColor: "black", borderRadius: "5px" }} />
             <input
               required
+              multiple
               class="form-control"
               type="file"
               accept=".jpg,.png,.jpeg"
               id="image"
               style={{ marginTop: "10px" }}
               onChange={(e) => selectFiles(e.target.files)}
-              multiple="multiple"
             />
             <label for="image">Upload catalog content (Support .jpeg .jpg .png)</label>
-            <br />
-            <br />
-            <input
-              required
-              class="form-control"
-              type="file"
-              accept=".jpg,.png,.jpeg,.bmp"
-              id="image"
-              style={{ marginTop: "10px" }}
-              onChange={(e) => selectFiles(e.target.files)}
-            />
-            <label for="image">Upload preview catalog (Support .jpg .png .jpeg .bmp)</label>
             <div className="right-align">
               <button type="submit" className="btn btn-primary btn-block" id="to-catalog" style={{ marginTop: "2vh" }}>Submit</button>
               <button type="reset" className="btn btn-primary btn-block" value="Reset" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red", marginLeft: "10px" }} onClick={() => {
-            setItem({ ...item, name: '', detail: '', dimension: '', price: '', place: '', image: [], full64: [], AllPost: [], AllModel: [], model: false})}}>Reset form</button>
+                setItem({ ...item, image: [], imagePreview: [], full64: [], fullPreview: [] })
+              }}>Reset form</button>
             </div>
           </form>
           <button className="btn btn-primary btn-block" id="load-model" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} onClick={() => {
@@ -280,7 +288,25 @@ const Edit = () => {
           }}>Load catalog data</button>
         </div>}
         {display == "model" && <div className="flex-child lightgreen" id="model" style={{ borderColor: "green" }}>
-          <form action="" onSubmit={(e) => {onSubmitHandler("editmodel", e)}}>
+          <form action="" onSubmit={(e) => { onSubmitHandler("editmodel", e) }}>
+            <u><h5>All data in model (ข้อมูลโมเดลทั้งหมด)</h5></u>
+            {isOpen && <Popup
+              content={<>
+                <b>Design your Popup</b>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                <img src={`data:image/jpg;base64,${img64}`} alt="placeholder" width="50px" height="50px"></img>
+              </>}
+              handleClose={closePopup}
+            />}
+            <div>
+              {allData ? allData.map((model, index) => {
+                return (
+                  <div>
+                    <Link to="/edit" onClick={(e) => { togglePopup(model.uid, model.title, "getmodel", e) }}>{model.title} {model.dateModified}</Link>
+                    <br />
+                  </div>)
+              }) : null}
+            </div>
             <u><h5>To model (เพิ่มโมเดล)</h5></u>
             <label for="name">&nbsp; Name (ชื่อโมเดล)</label>
             <br />
@@ -294,7 +320,7 @@ const Edit = () => {
             <br />
             <input required type="text" id="price-model" name="pricemodel" className="form-control" placeholder="Enter price" style={{ borderColor: "black", borderRadius: "5px" }} />
             <br />
-            <label for="dimension">&nbsp; Dimension (ขนาด)</label>
+            <label for="dimension">&nbsp; Enter width dimension (ขนาดความกว้างของโมเดล)</label>
             <br />
             <input required type="text" id="dimension-model" name="dimensionmodel" className="form-control" placeholder="Enter dimension" style={{ borderColor: "black", borderRadius: "5px" }} />
             <input
@@ -312,6 +338,24 @@ const Edit = () => {
             <label for="image">Upload model (Support .gltf)</label>
             <br />
             <br />
+            <button className="btn btn-primary btn-block" id="btn-catalog" style={{ backgroundColor: "darkgoldenrod", borderColor: "darkgoldenrod", marginRight: "5px", marginBottom: "5px" }} onClick={toggleAddon}>Add model component (เพิ่มส่วนประกอบโมเดล)</button>
+            {chkAddon == "addon" &&
+              <>
+                <input
+                  required
+                  class="form-control"
+                  type="file"
+                  accept=".gltf"
+                  id="image"
+                  style={{ marginTop: "10px", borderColor: "darkgoldenrod", borderWidth: "2px" }}
+                  onChange={(e) => selectAddon(e.target.files)}
+                />
+                <label for="image">Upload model component (Support .gltf)</label>
+              </>
+
+            }
+            <br />
+            <br />
             <input
               required
               class="form-control"
@@ -319,30 +363,21 @@ const Edit = () => {
               accept=".jpg,.png,.jpeg,.bmp"
               id="image"
               style={{ marginTop: "10px" }}
-              onChange={(e) => selectFiles(e.target.files)}
+              onChange={(e) => selectPreview(e.target.files)}
             />
-            <label for="image">Upload preview model (Support .jpg .png .jpeg .bmp)</label>
+            <label for="image">Upload preview model (Support .jpeg .jpg .png)</label>
             <br />
             <br />
             <div className="right-align">
               <button type="submit" className="btn btn-primary btn-block" id="to-model" style={{ marginTop: "2vh" }}>Submit</button>
               <button type="reset" className="btn btn-primary btn-block" value="Reset" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red", marginLeft: "10px" }} onClick={() => {
-            setItem({ ...item, name: '', detail: '', dimension: '', price: '', place: '', image: [], full64: [], AllPost: [], AllModel: [], model: false})}}>Reset form</button>
+                setItem({ ...item, image: [], imagePreview: [], full64: [], fullPreview: [] })
+              }}>Reset form</button>
             </div>
           </form>
           <button className="btn btn-primary btn-block" id="load-model" style={{ marginTop: "2vh", background: "green", borderColor: "green" }} onClick={() => {
             listAllData("listmodel")
           }}>Load model data</button>
-          <div>
-            {allData ? allData.map((model, index) => {
-              return (
-                <div>
-                  <a href={`${url}/${model.title}`}>{model.title} {model.dateModified}</a>
-                  <br />
-                  {console.log(model.dateModified)}
-                </div>)
-            }) : null}
-          </div>
         </div>}
       </div>
     </div>

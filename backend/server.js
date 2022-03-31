@@ -99,113 +99,155 @@ app.post("/logout", checkAuth, (req, res) => {
 app.get("/listmodel", async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
-    let result = await client.db("sbuiltin").collection("model").find({}, { projection: { _id: 0, title: 1, about: 1, dimension: 1, price: 1, pathimg: 1, dateModified: 1} }).toArray();
+    let result = await client.db("sbuiltin").collection("model").find({}, { projection: { _id: 0, title: 1, about: 1, dimension: 1, price: 1, pathimg: 1, imgforpreview: 1, dateModified: 1, uid: 1} }).toArray();
     console.log("Hello from get listmodel");
     res.send(result);
+})
+
+app.post("/getmodel", async (req,res) => {
+    const { uid, name } = req.body;
+    let data = { uid: uid ,
+                 title: name,
+                };
+    const client = new MongoClient(uri);
+    await client.connect();
+    let result = await client.db("sbuiltin").collection("model").findOne(data);
+    let img = result.imgforpreview;
+    console.log(img);
+    let img64 = fs.readFileSync(img, "base64");
+    res.send(img64);
+    console.log("Hello from get model");
 })
 
 app.get("/listcatalog", async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
-    let result = await client.db("sbuiltin").collection("catalog").find({}, { projection: { _id: 0, title: 1, about: 1, place: 1, pathimg: 1, dateModified: 1} }).toArray();
+    let result = await client.db("sbuiltin").collection("catalog").find({}, { projection: { _id: 0, title: 1, about: 1, place: 1, pathimg: 1, imgforpreview: 1, dateModified: 1, uid: 1} }).toArray();
     console.log("Hello from get listcatalog");
     res.send(result);
 })
 
+app.post("/getcatalog", async (req,res) => {
+    const { uid, name } = req.body;
+    let data = { uid: uid ,
+                 title: name,
+                };
+    const client = new MongoClient(uri);
+    await client.connect();
+    let result = await client.db("sbuiltin").collection("catalog").findOne(data);
+    let img = result.imgforpreview;
+    let img64 = fs.readFileSync(img, "base64");
+    res.send(img64);
+    console.log("Hello from get catalog");
+})
+
 app.post("/editcatalog", async (req, res) => {
-    const { namecat, detailcat, placecat, image } = req.body;
-    let query = { namecat, detailcat, placecat, image };
-    // var name = req.body.name;
-    // var detail = req.body.detail;
-    // var image = req.body.image;
-    // var place = req.body.place;
+    const { namecat, detailcat, placecat, image, uid } = req.body;
+    let query = { namecat, detailcat, placecat, image, uid };
     let today = new Date();
     var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
     var time = today.getHours() + ":" + today.getMinutes();
-    var serverDate = `${date}@${time}`;
+    var serverDate = `Last modified: ${date}@${time}`;
     console.log(date);
     console.log("Hello from post editcatalog");
     let path = [];
-        let imgUid = uuidv4();
-        fs.mkdirSync(`./catalog/${imgUid}`, { recursive: true });
-        let rootPath = `./catalog/${imgUid}`;
-        let imgPath;
-        for (let i = 0; i < query.image.length; i++) {
-            imgUid = uuidv4();
-            let base64Image = query.image[i].split(";base64,").pop();
-            imgPath = rootPath + `/${imgUid}.jpg`;
-            path.push(imgPath);
-            fs.writeFile(
-                imgPath,
-                base64Image,
-                { encoding: "base64" },
-                function (err) {
-                    console.log(`jpg created`);
-                }
-            );
+    let imgUid = uuidv4();
+    fs.mkdirSync(`./catalog/all-img/${query.uid}`, { recursive: true });
+    let rootPath = `./catalog/all-img/${query.uid}`;
+    let imgPath;
+    let previewimg;
+    for (let i = 0; i < query.image.length; i++) {
+        imgUid = uuidv4();
+        let base64Image = query.image[i].split(";base64,").pop();
+        imgPath = rootPath + `/${imgUid}.jpg`;
+        path.push(imgPath);
+        fs.writeFile(
+            imgPath,
+            base64Image,
+            { encoding: "base64" },
+            function (err) {
+                console.log(`jpg created`);
+            }
+        );
+        if(i==0) {
+            previewimg = imgPath;
         }
-        var cat = {
-            title: query.namecat,
-            about: query.detailcat,
-            place: query.placecat,
-            pathimg: path,
-            uid: imgUid,
-            dateModified: serverDate
-        }
-        console.log(imgPath);
-        const client = new MongoClient(uri);
-        await client.connect();
-        let info = await client.db("sbuiltin").collection("catalog").insertOne(cat);
-        if (info) {
-            console.log("Data inserted");
-            let JSONdata = JSON.stringify({
-                status: "Completed",
-                msg: "Upload completed!",
-            });
-            client.close();
-            res.status(200).end(JSONdata);
-            console.log(JSONdata);
-        }
-        else {
-            console.log("Error");
-            let JSONdata = JSON.stringify({
-                status: "Failed",
-                msg: "Error! Cannot connect to database.",
-            });
-            client.close();
-            res.status(401).end(JSONdata);
-            console.log(JSONdata);
-        }
+    }
+    // fs.mkdirSync(`./catalog/preview-img/${query.uid}`, { recursive: true });
+    // rootPath = `./catalog/preview-img/${query.uid}`;
+    // imgUid = uuidv4();
+    // let base64Image = query.image[0].split(";base64,").pop();
+    // imgPath = rootPath + `/${imgUid}.jpg`;
+    // path.push(imgPath);
+    // fs.writeFile(
+    //     imgPath,
+    //     base64Image,
+    //     { encoding: "base64" },
+    //     function (err) {
+    //         console.log(`jpg created`);
+    //     }
+    // );
+    var cat = {
+        title: query.namecat,
+        about: query.detailcat,
+        place: query.placecat,
+        pathimg: path,
+        imgforpreview: previewimg,
+        uid: query.uid,
+        dateModified: serverDate
+    }
+    console.log(imgPath);
+    const client = new MongoClient(uri);
+    await client.connect();
+    let info = await client.db("sbuiltin").collection("catalog").insertOne(cat);
+    if (info) {
+        console.log("Data inserted");
+        let JSONdata = JSON.stringify({
+            status: "Completed",
+            msg: "Upload completed!",
+        });
+        client.close();
+        res.status(200).end(JSONdata);
+        console.log(JSONdata);
+    }
+    else {
+        console.log("Error");
+        let JSONdata = JSON.stringify({
+            status: "Failed",
+            msg: "Error! Cannot connect to database.",
+        });
+        client.close();
+        res.status(401).end(JSONdata);
+        console.log(JSONdata);
+    }
 })
 
 app.post("/editmodel", async (req, res) => {
-    const { namemodel, detailmodel, pricemodel, dimensionmodel, image } = req.body;
-    let query = { namemodel, detailmodel, pricemodel, dimensionmodel, image };
-    // var name = req.body.name;
-    // var detail = req.body.detail;
-    // var price = req.body.price;
-    // var chkmodel = req.body.model;
-    // var image = req.body.image;
-    // var dimension = req.body.dimension;
+    const { namemodel, detailmodel, pricemodel, dimensionmodel, image, imagePreview, imageAddon, uid } = req.body;
+    let query = { namemodel, detailmodel, pricemodel, dimensionmodel, image, imagePreview, imageAddon, uid };
     let today = new Date();
     var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
     var time = today.getHours() + ":" + today.getMinutes();
-    var serverDate = `${date}@${time}`;
+    var serverDate = `Last modified: ${date}@${time}`;
+    let dimensionNum = parseInt(query.dimensionmodel)
+    console.log(dimensionNum);
     console.log(date);
     console.log("Hello from post editmodel");
-    // const { uid } = req.body;
-
     // console.log("this is model check = " + chkmodel);
     let path = [];
+    let addon= [];
+    let preview= [];
     let imgUid = uuidv4();
-    fs.mkdirSync(`./model/${imgUid}`, { recursive: true });
-    let rootPath = `./model/${imgUid}`;
+    fs.mkdirSync(`./model/all-img/${query.uid}`, { recursive: true });
+    let rootPath = `./model/all-img/${query.uid}`;
     let imgPath;
+    let previewimg;
+    var model;
     // console.log(name);
     for (let i = 0; i < query.image.length; i++) {
         imgUid = uuidv4();
         let base64Image = query.image[i].split(";base64,").pop();
-        imgPath = rootPath + `/${imgUid}.gltf`;
+        imgPath = rootPath + `/${query.uid}.gltf`;
         path.push(imgPath);
         fs.writeFile(
             imgPath,
@@ -216,15 +258,65 @@ app.post("/editmodel", async (req, res) => {
             }
         );
     }
-    var model = {
-        title: query.namemodel,
-        about: query.detailmodel,
-        price: query.pricemodel,
-        dimension: query.dimensionmodel,
-        pathimg: path,
-        uid: imgUid,
-        dateModified: serverDate,
-        // isModel: chkmodel
+    imgUid = uuidv4();
+    fs.mkdirSync(`./model/preview-img/${query.uid}`, { recursive: true });
+    rootPath = `./model/preview-img/${query.uid}`;
+    for (let i = 0; i < query.imagePreview.length; i++) {
+        imgUid = uuidv4();
+        let base64Image = query.imagePreview[i].split(";base64,").pop();
+        imgPath = rootPath + `/${imgUid}.jpg`;
+        preview.push(imgPath);
+        fs.writeFile(
+            imgPath,
+            base64Image,
+            { encoding: "base64" },
+            function (err) {
+                console.log(`jpg created`);
+            }
+        );
+        if(i==0) {
+            previewimg = imgPath;
+        }
+    }
+    if(query.imageAddon !== null) {
+        fs.mkdirSync(`./model/addon/${query.uid}`, { recursive: true });
+        rootPath = `./model/addon/${query.uid}`;
+        for (let i = 0; i < query.imageAddon.length; i++) {
+            imgUid = uuidv4();
+            let base64Image = query.imageAddon[i].split(";base64,").pop();
+            imgPath = rootPath + `/${imgUid}.gltf`;
+            addon.push(imgPath);
+            fs.writeFile(
+                imgPath,
+                base64Image,
+                { encoding: "base64" },
+                function (err) {
+                    console.log(`gltf created`);
+                }
+            );
+        }
+        model = {
+            title: query.namemodel,
+            about: query.detailmodel,
+            price: query.pricemodel,
+            widthDimension: query.dimensionmodel,
+            pathimg: path,
+            pathaddon: addon,
+            imgforpreview: previewimg,
+            uid: query.uid,
+            dateModified: serverDate,
+        }
+    } else {
+        model = {
+            title: query.namemodel,
+            about: query.detailmodel,
+            price: query.pricemodel,
+            widthDimension: query.dimensionmodel,
+            pathimg: path,
+            imgforpreview: previewimg,
+            uid: query.uid,
+            dateModified: serverDate,
+        }
     }
     const client = new MongoClient(uri);
     await client.connect();
