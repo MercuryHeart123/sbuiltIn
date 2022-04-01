@@ -96,48 +96,166 @@ app.post("/logout", checkAuth, (req, res) => {
     });
 });
 
+app.post("/deletepost", async (req, res) => {
+    const { uuid, pathDB } = req.body;
+    let data = { uid: uuid };
+    console.log(data);
+    let path = pathDB
+    console.log(path);
+    console.log("Hello from deletepost");
+    const client = new MongoClient(uri);
+    await client.connect();
+    if (path == "catalog") {
+        let result = await client.db("sbuiltin").collection("catalog").findOne(data);
+        // console.log(result);
+        console.log("it's catalog");
+        if (result) {
+            let rootPath = `./catalog/all-img/${uuid}`;
+            fs.rmdirSync(rootPath, { recursive: true });
+            let del = await client.db("sbuiltin").collection("catalog").deleteOne(result);
+            if (del) {
+                console.log("Post deleted");
+                let JSONdata = JSON.stringify({
+                    status: "Completed",
+                    msg: "Delete process completed!",
+                });
+                client.close();
+                res.status(200).end(JSONdata);
+                console.log(JSONdata);
+            }
+            else {
+                console.log("Error");
+                let JSONdata = JSON.stringify({
+                    status: "Failed",
+                    msg: "Error! Cannot connect to database.",
+                });
+                client.close();
+                res.status(401).end(JSONdata);
+                console.log(JSONdata);
+            }
+        }
+    } else if(path == "model") {
+        let result = await client.db("sbuiltin").collection("model").findOne(data);
+        console.log(result.pathaddon);
+        console.log("it's model");
+        if (result && result.pathaddon !== undefined) {
+            let imgPath = `./model/all-img/${uuid}`;
+            let addonPath = `./model/addon/${uuid}`;
+            let previewPath = `./model/preview-img/${uuid}`
+            fs.rmdirSync(imgPath, { recursive: true });
+            fs.rmdirSync(addonPath, { recursive: true });
+            fs.rmdirSync(previewPath, { recursive: true });
+            let del = await client.db("sbuiltin").collection("model").deleteOne(result);
+            if (del) {
+                console.log("Post deleted");
+                let JSONdata = JSON.stringify({
+                    status: "Completed",
+                    msg: "Delete process completed!",
+                });
+                client.close();
+                res.status(200).end(JSONdata);
+                console.log(JSONdata);
+            }
+            else {
+                console.log("Error");
+                let JSONdata = JSON.stringify({
+                    status: "Failed",
+                    msg: "Error! Cannot connect to database.",
+                });
+                client.close();
+                res.status(401).end(JSONdata);
+                console.log(JSONdata);
+            }
+        } else if (result && result.pathaddon === undefined) {
+            let imgPath = `./model/all-img/${uuid}`;
+            let previewPath = `./model/preview-img/${uuid}`
+            fs.rmdirSync(imgPath, { recursive: true });
+            fs.rmdirSync(previewPath, { recursive: true });
+            let del = await client.db("sbuiltin").collection("model").deleteOne(result);
+            if (del) {
+                console.log("Post deleted");
+                let JSONdata = JSON.stringify({
+                    status: "Completed",
+                    msg: "Delete process completed!",
+                });
+                client.close();
+                res.status(200).end(JSONdata);
+                console.log(JSONdata);
+            }
+            else {
+                console.log("Error");
+                let JSONdata = JSON.stringify({
+                    status: "Failed",
+                    msg: "Error! Cannot connect to database.",
+                });
+                client.close();
+                res.status(401).end(JSONdata);
+                console.log(JSONdata);
+            }
+        }
+    }
+})
+
 app.get("/listmodel", async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
-    let result = await client.db("sbuiltin").collection("model").find({}, { projection: { _id: 0, title: 1, about: 1, dimension: 1, price: 1, pathimg: 1, imgforpreview: 1, dateModified: 1, uid: 1} }).toArray();
+    let result = await client.db("sbuiltin").collection("model").find({}, { projection: { _id: 0, title: 1, about: 1, dimension: 1, price: 1, pathimg: 1, imgforpreview: 1, dateModified: 1, uid: 1 } }).toArray();
     console.log("Hello from get listmodel");
     res.send(result);
 })
 
-app.post("/getmodel", async (req,res) => {
+app.post("/getmodel", async (req, res) => {
     const { uid, name } = req.body;
-    let data = { uid: uid ,
-                 title: name,
-                };
+    let data = {
+        uid: uid,
+        title: name,
+    };
     const client = new MongoClient(uri);
     await client.connect();
     let result = await client.db("sbuiltin").collection("model").findOne(data);
+    let info = [];
     let img = result.imgforpreview;
-    console.log(img);
+    let uuid = result.uid;
+    let title = result.title;
+    let about = result.about;
+    let price = result.price;
+    let width = result.widthDimension;
+    let date = result.dateModified;
     let img64 = fs.readFileSync(img, "base64");
-    res.send(img64);
+    info.push(title, about, price, width, date, uuid, img64);
+    res.send(info);
     console.log("Hello from get model");
 })
 
 app.get("/listcatalog", async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
-    let result = await client.db("sbuiltin").collection("catalog").find({}, { projection: { _id: 0, title: 1, about: 1, place: 1, pathimg: 1, imgforpreview: 1, dateModified: 1, uid: 1} }).toArray();
+    let result = await client.db("sbuiltin").collection("catalog").find({}, { projection: { _id: 0, title: 1, about: 1, place: 1, pathimg: 1, imgforpreview: 1, dateModified: 1, uid: 1 } }).toArray();
     console.log("Hello from get listcatalog");
     res.send(result);
 })
 
-app.post("/getcatalog", async (req,res) => {
+app.post("/getcatalog", async (req, res) => {
     const { uid, name } = req.body;
-    let data = { uid: uid ,
-                 title: name,
-                };
+    let data = {
+        uid: uid,
+        title: name,
+    };
     const client = new MongoClient(uri);
     await client.connect();
     let result = await client.db("sbuiltin").collection("catalog").findOne(data);
+    // console.log(result);
+    let info = [];
     let img = result.imgforpreview;
+    let uuid = result.uid;
+    let title = result.title;
+    let about = result.about;
+    let place = result.place;
+    let date = result.dateModified;
     let img64 = fs.readFileSync(img, "base64");
-    res.send(img64);
+    info.push(title, about, place, date, uuid, img64);
+    // console.log(info);
+    res.send(info);
     console.log("Hello from get catalog");
 })
 
@@ -145,7 +263,7 @@ app.post("/editcatalog", async (req, res) => {
     const { namecat, detailcat, placecat, image, uid } = req.body;
     let query = { namecat, detailcat, placecat, image, uid };
     let today = new Date();
-    var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+    var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
     var time = today.getHours() + ":" + today.getMinutes();
     var serverDate = `Last modified: ${date}@${time}`;
     console.log(date);
@@ -169,7 +287,7 @@ app.post("/editcatalog", async (req, res) => {
                 console.log(`jpg created`);
             }
         );
-        if(i==0) {
+        if (i == 0) {
             previewimg = imgPath;
         }
     }
@@ -226,7 +344,7 @@ app.post("/editmodel", async (req, res) => {
     const { namemodel, detailmodel, pricemodel, dimensionmodel, image, imagePreview, imageAddon, uid } = req.body;
     let query = { namemodel, detailmodel, pricemodel, dimensionmodel, image, imagePreview, imageAddon, uid };
     let today = new Date();
-    var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+    var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
     var time = today.getHours() + ":" + today.getMinutes();
     var serverDate = `Last modified: ${date}@${time}`;
     let dimensionNum = parseInt(query.dimensionmodel)
@@ -235,8 +353,8 @@ app.post("/editmodel", async (req, res) => {
     console.log("Hello from post editmodel");
     // console.log("this is model check = " + chkmodel);
     let path = [];
-    let addon= [];
-    let preview= [];
+    let addon = [];
+    let preview = [];
     let imgUid = uuidv4();
     fs.mkdirSync(`./model/all-img/${query.uid}`, { recursive: true });
     let rootPath = `./model/all-img/${query.uid}`;
@@ -274,11 +392,11 @@ app.post("/editmodel", async (req, res) => {
                 console.log(`jpg created`);
             }
         );
-        if(i==0) {
+        if (i == 0) {
             previewimg = imgPath;
         }
     }
-    if(query.imageAddon !== null) {
+    if (query.imageAddon !== null) {
         fs.mkdirSync(`./model/addon/${query.uid}`, { recursive: true });
         rootPath = `./model/addon/${query.uid}`;
         for (let i = 0; i < query.imageAddon.length; i++) {

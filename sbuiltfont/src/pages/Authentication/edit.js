@@ -110,33 +110,33 @@ const Edit = () => {
       let image = item.image;
       let imagePreview = item.imagePreview;
       let imageAddon;
-      if(imageAddon !== null) {
+      if (imageAddon !== null) {
         imageAddon = item.imageAddon;
         const formData = { namemodel, detailmodel, pricemodel, dimensionmodel, image, imagePreview, imageAddon, uid };
         axios.post(urldata, formData)
-        .then(() => {
-          alert("Complete: data has been uploaded!");
-          listAllData("listmodel");
-        })
-        .catch((err) => {
-          alert("Failed: client and server are out of sync!");
-          console.log(err.response.data.msg);
+          .then(() => {
+            alert("Complete: data has been uploaded!");
+            listAllData("listmodel");
+          })
+          .catch((err) => {
+            alert("Failed: client and server are out of sync!");
+            console.log(err.response.data.msg);
 
-        });
+          });
       } else {
         const formData = { namemodel, detailmodel, pricemodel, dimensionmodel, image, imagePreview, uid };
         axios.post(urldata, formData)
-        .then(() => {
-          alert("Complete: data has been uploaded!");
-          listAllData("listmodel");
-        })
-        .catch((err) => {
-          alert("Failed: client and server are out of sync!");
-          console.log(err.response.data.msg);
+          .then(() => {
+            alert("Complete: data has been uploaded!");
+            listAllData("listmodel");
+          })
+          .catch((err) => {
+            alert("Failed: client and server are out of sync!");
+            console.log(err.response.data.msg);
 
-        });
+          });
       }
-     
+
     } else if (type == "editcatalog") {
       let namecat = e.target.namecat.value;
       let detailcat = e.target.detailcat.value;
@@ -186,6 +186,7 @@ const Edit = () => {
       .then((res) => {
         let response = res.data;
         setimg64(response);
+        // console.log(response);
         console.log("Data from get catalog or model has been received");
 
       })
@@ -206,6 +207,33 @@ const Edit = () => {
       setchkAddon("addon");
     } else if (chkAddon === "addon") {
       setchkAddon("");
+    }
+  }
+
+  const deletefromDB = (type, uid, e) => {
+    e.preventDefault();
+    let uuid = uid;
+    let pathDB = type;
+    console.log(uuid);
+    const urldata = url + "/deletepost";
+    const formData = { uuid, pathDB };
+    axios.post(urldata, formData)
+      .then(() => {
+        alert("Complete: post has been deleted!");
+        console.log("Data from get catalog or model has been received");
+
+      })
+      .catch((err) => {
+        console.log(err);
+        console.log("Error: either server or database is down!");
+      })
+    setIsOpen(false);
+    if(pathDB == "catalog") {
+      setallData([]);
+      listAllData("listcatalog");
+    } else if(pathDB == "model") {
+      setallData([]);
+      listAllData("listmodel");
     }
   }
 
@@ -237,9 +265,28 @@ const Edit = () => {
             <u><h5>All post in catalog (รายการทั้งหมดของแคตตาล้อก)</h5></u>
             {isOpen && <Popup
               content={<>
-                <b>Design your Popup</b>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                <img src={`data:image/jpg;base64,${img64}`} alt="placeholder" width="50px" height="50px"></img>
+                <u><h5>แก้ไขข้อมูล (Edit)</h5></u>
+                <label for="name">&nbsp; Name (ชื่อผลงาน)</label>
+                <br />
+                <input defaultValue={img64[0]} type="text" id="name-cat" name="namecat" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }}/>
+                <br />
+                <label for="detail">&nbsp; Detail (รายละเอียด)</label>
+                <br />
+                <input defaultValue={img64[1]} type="text" id="detail-cat" name="detailcat" className="form-control" placeholder="Enter detail" style={{ borderColor: "black", borderRadius: "5px" }} />
+                <br />
+                <label for="place">&nbsp; Place (สถานที่)</label>
+                <br />
+                <input defaultValue={img64[2]} type="text" id="place-cat" name="placecat" className="form-control" placeholder="Enter place" style={{ borderColor: "black", borderRadius: "5px" }} />
+                <br />
+                <label for="preview">&nbsp; Preview image (ภาพตัวอย่าง)</label>
+                <br />
+                <img src={`data:image/jpg;base64,${img64[5]}`} id="preview" alt="placeholder" width="50%" height="50%"></img>
+                <br />
+                <br />
+                <h6>{img64[3]}</h6>
+                <button className="btn btn-primary btn-block" id="delete-cat" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red" }} onClick={(e) => {
+                  deletefromDB("catalog", img64[4], e)
+                  listAllData("listcatalog");}}>Delete this post</button>
               </>}
               handleClose={closePopup}
             />}
@@ -292,9 +339,31 @@ const Edit = () => {
             <u><h5>All data in model (ข้อมูลโมเดลทั้งหมด)</h5></u>
             {isOpen && <Popup
               content={<>
-                <b>Design your Popup</b>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                <img src={`data:image/jpg;base64,${img64}`} alt="placeholder" width="50px" height="50px"></img>
+                <u><h5>แก้ไขข้อมูล (Edit)</h5></u>
+                <label for="name">&nbsp; Name (ชื่อโมเดล)</label>
+                <br />
+                <input defaultValue={img64[0]} type="text" id="name-model" name="namemodel" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }}/>
+                <br />
+                <label for="detail">&nbsp; Detail (รายละเอียด)</label>
+                <br />
+                <input defaultValue={img64[1]} type="text" id="detail-model" name="detailmodel" className="form-control" placeholder="Enter detail" style={{ borderColor: "black", borderRadius: "5px" }} />
+                <br />
+                <label for="price">&nbsp; Price (ราคา)</label>
+                <br />
+                <input defaultValue={img64[2]} type="text" id="price-model" name="pricemodel" className="form-control" placeholder="Enter place" style={{ borderColor: "black", borderRadius: "5px" }} />
+                <br />
+                <label for="width">&nbsp; Width dimension (ขนาดความกว้างของโมเดล)</label>
+                <br />
+                <input defaultValue={img64[3]} type="text" id="width-model" name="widthmodel" className="form-control" placeholder="Enter place" style={{ borderColor: "black", borderRadius: "5px" }} />
+                <label for="preview">&nbsp; Preview image (ภาพตัวอย่าง)</label>
+                <br />
+                <img src={`data:image/jpg;base64,${img64[6]}`} id="preview" alt="placeholder" width="50%" height="50%"></img>
+                <br />
+                <br />
+                <h6>{img64[4]}</h6>
+                <button className="btn btn-primary btn-block" id="delete-cat" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red" }} onClick={(e) => {
+                  deletefromDB("model", img64[5], e)
+                  listAllData("listmodel");}}>Delete this post</button>
               </>}
               handleClose={closePopup}
             />}
@@ -371,7 +440,8 @@ const Edit = () => {
             <div className="right-align">
               <button type="submit" className="btn btn-primary btn-block" id="to-model" style={{ marginTop: "2vh" }}>Submit</button>
               <button type="reset" className="btn btn-primary btn-block" value="Reset" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red", marginLeft: "10px" }} onClick={() => {
-                setItem({ ...item, image: [], imagePreview: [], full64: [], fullPreview: [] })
+                setItem({ ...item, image: [], imagePreview: [], imageAddon: null, full64: [], fullPreview: [], fullAddon: null });
+                setchkAddon("");
               }}>Reset form</button>
             </div>
           </form>
