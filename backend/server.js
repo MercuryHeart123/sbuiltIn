@@ -347,80 +347,111 @@ app.post("/editmodel", async (req, res) => {
     var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
     var time = today.getHours() + ":" + today.getMinutes();
     var serverDate = `Last modified: ${date}@${time}`;
+    let priceNum = parseInt(query.pricemodel);
     let dimensionNum = parseInt(query.dimensionmodel)
     console.log(dimensionNum);
     console.log(date);
     console.log("Hello from post editmodel");
-    // console.log("this is model check = " + chkmodel);
-    let path = [];
-    let addon = [];
-    let preview = [];
-    let imgUid = uuidv4();
+    let imgUid;
     fs.mkdirSync(`./model/all-img/${query.uid}`, { recursive: true });
     let rootPath = `./model/all-img/${query.uid}`;
-    let imgPath;
-    let previewimg;
+    let modelImg;
+    let previewImg;
+    let addon;
     var model;
+    let base64Image;
     // console.log(name);
-    for (let i = 0; i < query.image.length; i++) {
+    // for (let i = 0; i < query.image.length; i++) {
+    //     imgUid = uuidv4();
+    //     base64Image = query.image[i].split(";base64,").pop();
+    //     console.log(base64Image);
+    //     modelImg = rootPath + `/${query.uid}.gltf`;
+    //     fs.writeFile(
+    //         modelImg,
+    //         base64Image,
+    //         { encoding: "base64" },
+    //         function (err) {
+    //             console.log(`gltf created`);
+    //         }
+    //     );
+    // }
+    imgUid = uuidv4();
+    base64Image = query.image[0].split(";base64,").pop();
+    modelImg = rootPath + `/${query.uid}.gltf`;
+    fs.writeFile(
+        modelImg,
+        base64Image,
+        { encoding: "base64" },
+        function (err) {
+            console.log(`gltf created`);
+        }
+    );
+    fs.mkdirSync(`./model/preview-img/${query.uid}`, { recursive: true });
+    rootPath = `./model/preview-img/${query.uid}`;
+    // for (let i = 0; i < query.imagePreview.length; i++) {
+    //     imgUid = uuidv4();
+    //     let base64Image = query.imagePreview[i].split(";base64,").pop();
+    //     imgPath = rootPath + `/${imgUid}.jpg`;
+    //     preview.push(imgPath);
+    //     fs.writeFile(
+    //         imgPath,
+    //         base64Image,
+    //         { encoding: "base64" },
+    //         function (err) {
+    //             console.log(`jpg created`);
+    //         }
+    //     );
+    //     if (i == 0) {
+    //         previewimg = imgPath;
+    //     }
+    // }
+    imgUid = uuidv4();
+    base64Image = query.imagePreview[0].split(";base64,").pop();
+    previewImg = rootPath + `/${imgUid}.jpg`;
+    fs.writeFile(
+        previewImg,
+        base64Image,
+        { encoding: "base64" },
+        function (err) {
+            console.log(`jpg created`);
+        }
+    );
+    if (query.imageAddon !== null) {
+        fs.mkdirSync(`./model/addon/${query.uid}`, { recursive: true });
+        rootPath = `./model/addon/${query.uid}`;
+        // for (let i = 0; i < query.imageAddon.length; i++) {
+        //     imgUid = uuidv4();
+        //     let base64Image = query.imageAddon[i].split(";base64,").pop();
+        //     imgPath = rootPath + `/${imgUid}.gltf`;
+        //     addon.push(imgPath);
+        //     fs.writeFile(
+        //         imgPath,
+        //         base64Image,
+        //         { encoding: "base64" },
+        //         function (err) {
+        //             console.log(`gltf created`);
+        //         }
+        //     );
+        // }
         imgUid = uuidv4();
-        let base64Image = query.image[i].split(";base64,").pop();
-        imgPath = rootPath + `/${query.uid}.gltf`;
-        path.push(imgPath);
+        base64Image = query.imageAddon[0].split(";base64,").pop();
+        addon = rootPath + `/${imgUid}.gltf`;
         fs.writeFile(
-            imgPath,
+            addon,
             base64Image,
             { encoding: "base64" },
             function (err) {
                 console.log(`gltf created`);
             }
         );
-    }
-    imgUid = uuidv4();
-    fs.mkdirSync(`./model/preview-img/${query.uid}`, { recursive: true });
-    rootPath = `./model/preview-img/${query.uid}`;
-    for (let i = 0; i < query.imagePreview.length; i++) {
-        imgUid = uuidv4();
-        let base64Image = query.imagePreview[i].split(";base64,").pop();
-        imgPath = rootPath + `/${imgUid}.jpg`;
-        preview.push(imgPath);
-        fs.writeFile(
-            imgPath,
-            base64Image,
-            { encoding: "base64" },
-            function (err) {
-                console.log(`jpg created`);
-            }
-        );
-        if (i == 0) {
-            previewimg = imgPath;
-        }
-    }
-    if (query.imageAddon !== null) {
-        fs.mkdirSync(`./model/addon/${query.uid}`, { recursive: true });
-        rootPath = `./model/addon/${query.uid}`;
-        for (let i = 0; i < query.imageAddon.length; i++) {
-            imgUid = uuidv4();
-            let base64Image = query.imageAddon[i].split(";base64,").pop();
-            imgPath = rootPath + `/${imgUid}.gltf`;
-            addon.push(imgPath);
-            fs.writeFile(
-                imgPath,
-                base64Image,
-                { encoding: "base64" },
-                function (err) {
-                    console.log(`gltf created`);
-                }
-            );
-        }
         model = {
             title: query.namemodel,
             about: query.detailmodel,
-            price: query.pricemodel,
-            widthDimension: query.dimensionmodel,
-            pathimg: path,
+            price: priceNum,
+            widthDimension: dimensionNum,
+            pathimg: modelImg,
             pathaddon: addon,
-            imgforpreview: previewimg,
+            imgforpreview: previewImg,
             uid: query.uid,
             dateModified: serverDate,
         }
@@ -428,10 +459,10 @@ app.post("/editmodel", async (req, res) => {
         model = {
             title: query.namemodel,
             about: query.detailmodel,
-            price: query.pricemodel,
-            widthDimension: query.dimensionmodel,
-            pathimg: path,
-            imgforpreview: previewimg,
+            price: priceNum,
+            widthDimension: dimensionNum,
+            pathimg: modelImg,
+            imgforpreview: previewImg,
             uid: query.uid,
             dateModified: serverDate,
         }

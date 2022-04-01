@@ -15,7 +15,7 @@ const Edit = () => {
   const [allImg, setallImg] = useState([]);
   const [img64, setimg64] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [chkAddon, setchkAddon] = useState("");
+  const [chkAddon, setchkAddon] = useState(false);
 
   const url = `${process.env.REACT_APP_IP}:${process.env.REACT_APP_PORT}`;
 
@@ -123,6 +123,7 @@ const Edit = () => {
             console.log(err.response.data.msg);
 
           });
+        resetAll("model");
       } else {
         const formData = { namemodel, detailmodel, pricemodel, dimensionmodel, image, imagePreview, uid };
         axios.post(urldata, formData)
@@ -135,6 +136,7 @@ const Edit = () => {
             console.log(err.response.data.msg);
 
           });
+        resetAll("model");
       }
 
     } else if (type == "editcatalog") {
@@ -155,8 +157,7 @@ const Edit = () => {
           alert("Failed: client and server are out of sync! Try reload this page");
           console.log(err.response.data.msg);
         });
-      // const result = await createItem(item);
-      // setItems([...items, result]);
+      resetAll("catalog");
     }
   }
 
@@ -203,11 +204,25 @@ const Edit = () => {
   }
 
   const toggleAddon = () => {
-    if (chkAddon !== "addon") {
-      setchkAddon("addon");
-    } else if (chkAddon === "addon") {
-      setchkAddon("");
+    if (chkAddon !== true) {
+      setchkAddon(true);
+    } else if (chkAddon === true) {
+      setchkAddon(false);
     }
+  }
+
+  const resetAll = (path) => {
+    if (path === "catalog") {
+      setItem({ ...item, image: [], imagePreview: [], full64: [], fullPreview: [] });
+      const form = document.getElementById("catalog-input");
+      form.reset();
+    } else if(path === "model") {
+      setItem({ ...item, image: [], imagePreview: [], imageAddon: null, full64: [], fullPreview: [], fullAddon: null });
+      setchkAddon(false);
+      const form = document.getElementById("model-input");
+      form.reset();
+    }
+
   }
 
   const deletefromDB = (type, uid, e) => {
@@ -261,7 +276,7 @@ const Edit = () => {
 
       <div className="flex-container">
         {display == "catalog" && <div className="flex-child lightyellow" id="catalog" style={{ borderColor: "darkblue" }}>
-          <form action="" onSubmit={(e) => { onSubmitHandler("editcatalog", e) }}>
+          <form id="catalog-input" onSubmit={(e) => { onSubmitHandler("editcatalog", e) }}>
             <u><h5>All post in catalog (รายการทั้งหมดของแคตตาล้อก)</h5></u>
             {isOpen && <Popup
               content={<>
@@ -324,9 +339,9 @@ const Edit = () => {
             />
             <label for="image">Upload catalog content (Support .jpeg .jpg .png)</label>
             <div className="right-align">
-              <button type="submit" className="btn btn-primary btn-block" id="to-catalog" style={{ marginTop: "2vh" }}>Submit</button>
+              <button type="submit" className="btn btn-primary btn-block" id="to-catalog" value="Reset" style={{ marginTop: "2vh" }}>Submit</button>
               <button type="reset" className="btn btn-primary btn-block" value="Reset" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red", marginLeft: "10px" }} onClick={() => {
-                setItem({ ...item, image: [], imagePreview: [], full64: [], fullPreview: [] })
+                resetAll("catalog");
               }}>Reset form</button>
             </div>
           </form>
@@ -335,7 +350,7 @@ const Edit = () => {
           }}>Load catalog data</button>
         </div>}
         {display == "model" && <div className="flex-child lightgreen" id="model" style={{ borderColor: "green" }}>
-          <form action="" onSubmit={(e) => { onSubmitHandler("editmodel", e) }}>
+          <form id="model-input" onSubmit={(e) => { onSubmitHandler("editmodel", e) }}>
             <u><h5>All data in model (ข้อมูลโมเดลทั้งหมด)</h5></u>
             {isOpen && <Popup
               content={<>
@@ -350,18 +365,18 @@ const Edit = () => {
                 <br />
                 <label for="price">&nbsp; Price (ราคา)</label>
                 <br />
-                <input defaultValue={img64[2]} type="text" id="price-model" name="pricemodel" className="form-control" placeholder="Enter place" style={{ borderColor: "black", borderRadius: "5px" }} />
+                <input defaultValue={img64[2]} type="number" id="price-model" name="pricemodel" className="form-control" placeholder="Enter price" style={{ borderColor: "black", borderRadius: "5px" }} />
                 <br />
                 <label for="width">&nbsp; Width dimension (ขนาดความกว้างของโมเดล)</label>
                 <br />
-                <input defaultValue={img64[3]} type="text" id="width-model" name="widthmodel" className="form-control" placeholder="Enter place" style={{ borderColor: "black", borderRadius: "5px" }} />
+                <input defaultValue={img64[3]} type="number" id="width-model" name="widthmodel" className="form-control" placeholder="Enter width dimension" style={{ borderColor: "black", borderRadius: "5px" }} />
                 <label for="preview">&nbsp; Preview image (ภาพตัวอย่าง)</label>
                 <br />
                 <img src={`data:image/jpg;base64,${img64[6]}`} id="preview" alt="placeholder" width="50%" height="50%"></img>
                 <br />
                 <br />
                 <h6>{img64[4]}</h6>
-                <button className="btn btn-primary btn-block" id="delete-cat" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red" }} onClick={(e) => {
+                <button className="btn btn-primary btn-block" id="delete-model" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red" }} onClick={(e) => {
                   deletefromDB("model", img64[5], e)
                   listAllData("listmodel");}}>Delete this post</button>
               </>}
@@ -387,11 +402,11 @@ const Edit = () => {
             <br />
             <label for="price">&nbsp; Enter price (ราคา)</label>
             <br />
-            <input required type="text" id="price-model" name="pricemodel" className="form-control" placeholder="Enter price" style={{ borderColor: "black", borderRadius: "5px" }} />
+            <input required type="number" id="price-model" name="pricemodel" className="form-control" placeholder="Enter price" style={{ borderColor: "black", borderRadius: "5px" }} />
             <br />
             <label for="dimension">&nbsp; Enter width dimension (ขนาดความกว้างของโมเดล)</label>
             <br />
-            <input required type="text" id="dimension-model" name="dimensionmodel" className="form-control" placeholder="Enter dimension" style={{ borderColor: "black", borderRadius: "5px" }} />
+            <input required type="number" id="dimension-model" name="dimensionmodel" className="form-control" placeholder="Enter width dimension" style={{ borderColor: "black", borderRadius: "5px" }} />
             <input
               required
               class="form-control"
@@ -402,13 +417,12 @@ const Edit = () => {
               onChange={(e) => {
                 selectFiles(e.target.files);
               }}
-              multiple="multiple"
             />
             <label for="image">Upload model (Support .gltf)</label>
             <br />
             <br />
-            <button className="btn btn-primary btn-block" id="btn-catalog" style={{ backgroundColor: "darkgoldenrod", borderColor: "darkgoldenrod", marginRight: "5px", marginBottom: "5px" }} onClick={toggleAddon}>Add model component (เพิ่มส่วนประกอบโมเดล)</button>
-            {chkAddon == "addon" &&
+            <button type="button" className="btn btn-primary btn-block" id="btn-addon" style={{ backgroundColor: "darkgoldenrod", borderColor: "darkgoldenrod", marginRight: "5px", marginBottom: "5px" }} onClick={toggleAddon}>Add model component (เพิ่มส่วนประกอบโมเดล)</button>
+            {chkAddon == true &&
               <>
                 <input
                   required
@@ -429,7 +443,7 @@ const Edit = () => {
               required
               class="form-control"
               type="file"
-              accept=".jpg,.png,.jpeg,.bmp"
+              accept=".jpg,.png,.jpeg"
               id="image"
               style={{ marginTop: "10px" }}
               onChange={(e) => selectPreview(e.target.files)}
@@ -438,10 +452,9 @@ const Edit = () => {
             <br />
             <br />
             <div className="right-align">
-              <button type="submit" className="btn btn-primary btn-block" id="to-model" style={{ marginTop: "2vh" }}>Submit</button>
+              <button type="submit" className="btn btn-primary btn-block" id="to-model" value="Reset" style={{ marginTop: "2vh" }}>Submit</button>
               <button type="reset" className="btn btn-primary btn-block" value="Reset" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red", marginLeft: "10px" }} onClick={() => {
-                setItem({ ...item, image: [], imagePreview: [], imageAddon: null, full64: [], fullPreview: [], fullAddon: null });
-                setchkAddon("");
+                resetAll("model");
               }}>Reset form</button>
             </div>
           </form>
