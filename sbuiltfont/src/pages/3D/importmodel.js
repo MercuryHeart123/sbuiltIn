@@ -8,6 +8,8 @@ import { Text } from "troika-three-text";
 import Line from "./line"
 import Inside from './inside'
 import useWindowDimensions from "./useWindowDimensions "
+import axios from "axios"
+import callBase64 from "./callBase64"
 
 
 extend({ Text });
@@ -18,7 +20,6 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
     const [pos, setPos] = useState([0, 0, 0]);
     const [turn, setTurn] = useState(0)
     const [canMove, setCanMove] = useState(true)
-    const [objUuid, setObjUuid] = useState()
     const [opts, setOpts] = useState({
         // font: "Prompt",
         fontSize: 0.1,
@@ -111,10 +112,12 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
                 return item
             }
         })
+
         for (let i = 0; i < arr.length; i++) {
             if (arr[i] == modelUuid) {
                 let range = traverseFindRight(objKey, arr[i])
                 let avg = (range / 2) - objKey[arr[i]].modelWidth / 2
+
                 return (<text
                     position-z={pos[2]}
                     position-x={pos[0] + avg}
@@ -131,19 +134,19 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
         }
     }
 
-    useEffect(() => {
+    useEffect(async () => {
         if (!model) {
             const loader = new GLTFLoader();
             const dracoLoader = new DRACOLoader();
             dracoLoader.setDecoderPath('three/examples/js/libs/draco/');
             loader.setDRACOLoader(dracoLoader);
-            loader.load(`${modelPath}`, async function (gltf) {
+            let data = await callBase64(modelPath, true)
+            data = JSON.stringify(data);
+            loader.parse(`${data}`, '', async function (gltf) {
 
                 gltf.scene.traverse((obj) => {
-
                     obj.userData.name = modelUuid
                 })
-                setObjUuid(modelUuid)
                 var box = new THREE.Box3().setFromObject(gltf.scene);
                 box.center(gltf.scene.position); // this re-sets the mesh position
                 gltf.scene.position.multiplyScalar(- 1)
@@ -183,7 +186,7 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
 
         // if (textRef.current) {
         //     if (textRef.current.position.y == 0) {
-        //         console.log(12);
+
 
         //         // textRef.current.position.y = 2.7
 
@@ -219,7 +222,7 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
                             continue // กันไม่ให้ obj ออกนอก ground
                         }
                         let arr = scene.children.filter((obj) => {
-                            if (obj.type == "Mesh" && obj.userData.name && obj.userData.name !== objUuid && !obj.userData.ground) {
+                            if (obj.type == "Mesh" && obj.userData.name && obj.userData.name !== modelUuid && !obj.userData.ground) {
                                 return obj
                             }
                         })
@@ -249,13 +252,13 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
 
                         let thisData
                         for (let j = 0; j < groupModel.length; j++) {
-                            if (groupModel[j].modelUuid == objUuid) {
+                            if (groupModel[j].modelUuid == modelUuid) {
                                 thisData = groupModel[j]
                                 break
                             }
                         }
                         let modelWithOutThis = groupModel.filter((item, index) => {
-                            if (item.modelUuid !== objUuid) {
+                            if (item.modelUuid !== modelUuid) {
                                 return item
                             }
                         })
@@ -274,11 +277,11 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
                                 if ((otherBox3.containsPoint(vecNE) || otherBox3.containsPoint(vecSE))
                                     && !otherData.left
                                 ) {
-                                    otherData.left = objUuid
+                                    otherData.left = modelUuid
                                     thisData.right = otherData.modelUuid
                                     thisData.left = false
                                     for (let k = 0; k < modelWithOutThis.length; k++) {
-                                        if (modelWithOutThis[k].right == objUuid) {
+                                        if (modelWithOutThis[k].right == modelUuid) {
                                             modelWithOutThis[k].right = false
                                             break
                                         }
@@ -288,11 +291,11 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
                                 if ((otherBox3.containsPoint(vecNW) || otherBox3.containsPoint(vecSW))
                                     && !otherData.right
                                 ) {
-                                    otherData.right = objUuid
+                                    otherData.right = modelUuid
                                     thisData.left = otherData.modelUuid
                                     thisData.right = false
                                     for (let k = 0; k < modelWithOutThis.length; k++) {
-                                        if (modelWithOutThis[k].left == objUuid) {
+                                        if (modelWithOutThis[k].left == modelUuid) {
                                             modelWithOutThis[k].left = false
                                             break
                                         }
@@ -316,10 +319,10 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
                             thisData.left = false
                             thisData.right = false
                             for (let k = 0; k < modelWithOutThis.length; k++) {
-                                if (modelWithOutThis[k].left == objUuid) {
+                                if (modelWithOutThis[k].left == modelUuid) {
                                     modelWithOutThis[k].left = false
                                 }
-                                if (modelWithOutThis[k].right == objUuid) {
+                                if (modelWithOutThis[k].right == modelUuid) {
                                     modelWithOutThis[k].right = false
                                 }
                             }
@@ -351,12 +354,12 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
         <>
             <mesh
                 onClick={(e) => {
+
                     const clickMouse = new THREE.Vector2();
                     clickMouse.x = (e.clientX / width) * 2 - 1;
                     clickMouse.y = -(e.clientY / height) * 2 + 1;
                     let found = intersect(clickMouse)
                     let uuid
-                    console.log(found);
                     for (let i = 0; i < found.length; i++) {
 
                         if (found[i].object.type == "Mesh" && !found[i].object.userData.isCustomize) {
@@ -364,9 +367,9 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
                             break
                         }
                     }
-                    console.log(uuid);
                     if (uuid == modelUuid) {
                         setFirstMeshUuid(uuid)
+
                         if (currentObj !== modelUuid) {
                             setObj(modelUuid)
                         }
@@ -384,8 +387,9 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
                     // else if (e.ctrlKey) {
                     //     setLock(!lock)
                     // }
-                }}
-                userData={{ name: objUuid }}
+                }
+                }
+                userData={{ name: modelUuid }}
 
                 castShadow receiveShadow>
                 <primitive
@@ -406,7 +410,7 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
 
                         return <Inside
                             setCanMove={setCanMove}
-                            parentUuid={objUuid}
+                            parentUuid={modelUuid}
                             modelUuid={item.modelUuid}
                             startPosition={item.startPosition}
                             modelPath={item.modelPath}
@@ -419,6 +423,7 @@ const ImportModel = ({ customize, startPosition, modelUuid, modelPath, modelName
 
 
             </mesh>
+
             {dragObjectRef && currentObj == modelUuid &&
                 <boxHelper ref={boxHelperRef} args={[dragObjectRef.current, "blue"]} />
             }

@@ -5,10 +5,7 @@ import useWindowDimensions from './useWindowDimensions '
 import * as THREE from "three"
 
 
-
-const CreateMenu = ({ setGroupModel, groupModel, setShowMenu, dummyModel, setAllModel, allModel, currentCamera, currentScene }) => {
-
-
+const CreateMenu = ({ fetchData, setGroupModel, groupModel, setShowMenu, setAllModel, allModel, currentCamera, currentScene }) => {
     function intersect(pos, camera, scene) {
         const raycaster = new THREE.Raycaster(); // create once
         raycaster.setFromCamera(pos, camera);
@@ -23,9 +20,17 @@ const CreateMenu = ({ setGroupModel, groupModel, setShowMenu, dummyModel, setAll
         return active
     }
 
-    const CreateMenuModel = ({ dummyModel }) => {
+
+    const CreateMenuModel = ({ fetchData }) => {
         const { height, width } = useWindowDimensions()
-        return dummyModel.map((item, index) => {
+        if (!fetchData) {
+            return <>
+                loading...
+            </>
+        }
+        console.log(fetchData.length);
+
+        return fetchData.map((item, index) => {
             let container = []
             if (index % 2 == 0 && index != 0) {
                 container.push(<br />)
@@ -56,34 +61,37 @@ const CreateMenu = ({ setGroupModel, groupModel, setShowMenu, dummyModel, setAll
                                 if (!found[i].object.userData.ground)
                                     continue
                                 let target = found[i].point;
-                                item.modelUuid = uuidv4()
-                                item.create = true
-                                item.startPosition = target
-                                item.showDetail = true
-                                item.customize = []
+                                let uuid4 = uuidv4()
+                                let tmpObj = JSON.parse(JSON.stringify(item));
+                                tmpObj.modelUuid = uuid4
+                                tmpObj.create = true
+                                tmpObj.startPosition = target
+                                tmpObj.showDetail = true
+                                tmpObj.customize = []
                                 let connection = {
-                                    modelUuid: item.modelUuid,
-                                    modelWidth: item.modelWidth,
+                                    modelUuid: tmpObj.modelUuid,
+                                    modelWidth: tmpObj.widthDimension,
                                     left: false,
                                     right: false,
                                     create: true
                                 }
                                 if (!allModel) {
                                     setGroupModel([connection])
-                                    setAllModel([item])
+                                    setAllModel([tmpObj])
                                 }
                                 else {
                                     setGroupModel([...groupModel, connection])
-                                    setAllModel([...allModel, item])
+                                    setAllModel([...allModel, tmpObj])
                                 }
                             }
                         }
 
-                    }}>
+                    }}
+                >
                     <div>
                         <img
                             draggable={false}
-                            src={item.previewPath}
+                            src={`data:image/png;base64,${item.base64}`}
                             style={{ maxHeight: '10vw', maxWidth: '10vw', margin: '2px' }}
                         />
                     </div>
@@ -135,7 +143,8 @@ const CreateMenu = ({ setGroupModel, groupModel, setShowMenu, dummyModel, setAll
                     <h5 style={{ textDecoration: 'underline' }}>โครงตู้:</h5>
                 </div>
                 <div className='ItemList' style={{ textAlign: 'center', justifyContent: 'center', display: 'flex', flexFlow: 'wrap' }}>
-                    {dummyModel && <CreateMenuModel dummyModel={dummyModel} />}
+
+                    {<CreateMenuModel fetchData={fetchData} />}
                 </div>
             </div>
 
@@ -145,12 +154,13 @@ const CreateMenu = ({ setGroupModel, groupModel, setShowMenu, dummyModel, setAll
                 </div>
                 <div className='ItemList'>
                     {allModel && allModel.map((item, index) => {
+                        console.log(item);
                         return (<>
                             {item.create && <div style={{ borderBottom: '1px solid #CECECE', width: '100%', borderRadius: '7px', paddingLeft: '15px', marginBottom: '2px' }}>
                                 <span style={{ display: 'flex', justifyContent: 'space-between' }}>
 
                                     <span>
-                                        {item.modelName}
+                                        {item.title}
                                     </span>
                                     <span>
                                         {checkCustomCreate(item.customize) > 0 && (item.showDetail ?

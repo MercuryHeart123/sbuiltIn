@@ -10,7 +10,7 @@ const MongoStore = require("connect-mongo");
 const { MongoClient } = require("mongodb");
 const { v4: uuidv4 } = require("uuid");
 
-const uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}:${process.env.DB_PORT}/sbuiltin`;
+const uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}:${process.env.DB_PORT}`;
 
 let port = process.env.PORT || 8080
 
@@ -134,7 +134,7 @@ app.post("/deletepost", async (req, res) => {
                 console.log(JSONdata);
             }
         }
-    } else if(path == "model") {
+    } else if (path == "model") {
         let result = await client.db("sbuiltin").collection("model").findOne(data);
         console.log(result.pathaddon);
         console.log("it's model");
@@ -199,10 +199,25 @@ app.post("/deletepost", async (req, res) => {
 app.get("/listmodel", async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
-    let result = await client.db("sbuiltin").collection("model").find({}, { projection: { _id: 0, title: 1, about: 1, dimension: 1, price: 1, pathimg: 1, imgforpreview: 1, dateModified: 1, uid: 1 } }).toArray();
-    console.log("Hello from get listmodel");
+    let result = await client.db("sbuiltin").collection("model").find().toArray();
     res.send(result);
 })
+
+app.post("/callbase64", (req, res) => {
+    const { path, model } = req.body;
+    if (!path) {
+        res.send();
+    }
+    else {
+        let file = fs.readFileSync(path);
+        if (model) {
+            res.send(file)
+        }
+        else {
+            res.send(file.toString("base64"));
+        }
+    }
+});
 
 app.post("/getmodel", async (req, res) => {
     const { uid, name } = req.body;

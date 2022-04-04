@@ -10,6 +10,9 @@ import { Link } from 'react-router-dom';
 import CreateMenu from './createMenu'
 import EachCustomize from './eachCustomize'
 import { IoChevronBack } from 'react-icons/io5';
+import { useEffect } from 'react'
+import axios from 'axios'
+import callBase64 from './callBase64'
 
 const ThreeD = () => {
     const [isDrag, setIsDrag] = useState(false)
@@ -21,7 +24,7 @@ const ThreeD = () => {
     const [groupModel, setGroupModel] = useState()
     const [currentCamera, setCurrentCamera] = useState()
     const [currentScene, setCurrentScene] = useState()
-
+    const [fetchData, setFetchData] = useState()
     const dummyModel = [{
         title: '50x240',
         modelName: '50cm',
@@ -69,12 +72,13 @@ const ThreeD = () => {
 
 
     const createAllModel = () => {
+
         return allModel.map((item, index) => {
             if (item.create) {
                 return (<ImportModel
                     modelUuid={`${item.modelUuid}`}
-                    modelPath={`${item.modelPath}`}
-                    modelName={`${item.modelName}`}
+                    modelPath={`${item.pathimg}`}
+                    modelName={`${item.title}`}
                     startPosition={item.startPosition}
                     customize={item.customize}
                     dimension={planeD}
@@ -91,6 +95,25 @@ const ThreeD = () => {
 
         })
     }
+    useEffect(async () => {
+        const url = `${process.env.REACT_APP_IP}:${process.env.REACT_APP_PORT}`;
+        const urlData = url + "/" + 'listmodel';
+        let data = await axios.get(urlData)
+        if (data.status == 200) {
+            let arr = []
+            data.data.map(async (item, index) => {
+                item.base64 = await callBase64(item.imgforpreview);
+                arr.push(item)
+
+                if (index == data.data.length - 1) {
+                    setFetchData(arr)
+                }
+
+            })
+
+        }
+
+    }, [])
 
     return (
         <div>
@@ -126,10 +149,10 @@ const ThreeD = () => {
                 {showMenu && !currentObj && <CreateMenu
                     groupModel={groupModel}
                     setGroupModel={setGroupModel}
+                    fetchData={fetchData}
                     allModel={allModel}
                     setAllModel={setAllModel}
                     setShowMenu={setShowMenu}
-                    dummyModel={dummyModel}
                     currentCamera={currentCamera}
                     currentScene={currentScene}
 
