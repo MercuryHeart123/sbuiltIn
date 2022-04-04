@@ -16,6 +16,8 @@ const Edit = () => {
   const [img64, setimg64] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [chkAddon, setchkAddon] = useState(false);
+  const [preUpload, setpreUpload] = useState([]);
+  const [Preview, setPreview] = useState(false);
 
   const url = `${process.env.REACT_APP_IP}:${process.env.REACT_APP_PORT}`;
 
@@ -38,12 +40,16 @@ const Edit = () => {
   }
 
   const selectFiles = (e) => {
-    let imgdata = item.full64;
+    let imgdata = [];
+    setpreUpload([]);
     for (let i = 0; i < e.length; i++) {
       parseImg(e[`${i}`]);
       imgdata.push(e[`${i}`]);
     }
     setItem({ ...item, full64: imgdata });
+    if(Preview !== true || Preview === true) {
+      setPreview(true);
+    }
   }
 
   const parseImg = (img) => {
@@ -53,6 +59,13 @@ const Edit = () => {
       list.push(e.target.result);
       setItem({ ...item, image: list });
       console.log(list);
+      let preview = [];
+      for (let i=0;i<list.length;i++) {
+        let base64Image = list[i].split(";base64,").pop();
+        preview.push(base64Image);
+        console.log(base64Image);
+      }
+      setpreUpload([...preview]);
     };
     reader.readAsDataURL(img);
   }
@@ -64,6 +77,9 @@ const Edit = () => {
       imgdata.push(e[`${i}`]);
     }
     setItem({ ...item, fullPreview: imgdata });
+    if(Preview !== true || Preview === true) {
+      setPreview(true);
+    }
   }
 
   const parsePreview = (img) => {
@@ -73,6 +89,13 @@ const Edit = () => {
       list.push(e.target.result);
       setItem({ ...item, imagePreview: list });
       console.log(list);
+      let preview = [];
+      for (let i=0;i<list.length;i++) {
+        let base64Image = list[i].split(";base64,").pop();
+        preview.push(base64Image);
+        console.log(base64Image);
+      }
+      setpreUpload([...preview]);
     };
     reader.readAsDataURL(img);
   }
@@ -216,12 +239,14 @@ const Edit = () => {
       setItem({ ...item, image: [], imagePreview: [], full64: [], fullPreview: [] });
       const form = document.getElementById("catalog-input");
       form.reset();
-    } else if(path === "model") {
+    } else if (path === "model") {
       setItem({ ...item, image: [], imagePreview: [], imageAddon: null, full64: [], fullPreview: [], fullAddon: null });
       setchkAddon(false);
       const form = document.getElementById("model-input");
       form.reset();
     }
+    setpreUpload([]);
+    setPreview(false);
 
   }
 
@@ -243,14 +268,22 @@ const Edit = () => {
         console.log("Error: either server or database is down!");
       })
     setIsOpen(false);
-    if(pathDB == "catalog") {
+    if (pathDB == "catalog") {
       setallData([]);
       listAllData("listcatalog");
-    } else if(pathDB == "model") {
+    } else if (pathDB == "model") {
       setallData([]);
       listAllData("listmodel");
     }
   }
+
+  const imglist = preUpload.map((img, index) => {
+    return (
+      <>
+      <img src={`data:image/jpg;base64,${img}`} style={{width: "40%", height: "40%", marginRight: "10px", marginTop: "10px"}}/>
+      </>
+    )
+  })
 
   useEffect(() => {
     // const fetchData = async () => {
@@ -281,17 +314,23 @@ const Edit = () => {
             {isOpen && <Popup
               content={<>
                 <u><h5>แก้ไขข้อมูล (Edit)</h5></u>
+                <button className="btn btn-primary btn-block" id="delete-cat" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red" }} onClick={(e) => {
+                  deletefromDB("catalog", img64[4], e)
+                  listAllData("listcatalog");
+                }}>ลบข้อมูล (Delete)</button>
+                <br />
+                <br />
                 <label for="name">&nbsp; Name (ชื่อผลงาน)</label>
                 <br />
-                <input defaultValue={img64[0]} type="text" id="name-cat" name="namecat" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }}/>
+                <input defaultValue={img64[0]} type="text" id="edit-cat" name="namecat" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }} />
                 <br />
                 <label for="detail">&nbsp; Detail (รายละเอียด)</label>
                 <br />
-                <input defaultValue={img64[1]} type="text" id="detail-cat" name="detailcat" className="form-control" placeholder="Enter detail" style={{ borderColor: "black", borderRadius: "5px" }} />
+                <input defaultValue={img64[1]} type="text" id="edit-cat" name="detailcat" className="form-control" placeholder="Enter detail" style={{ borderColor: "black", borderRadius: "5px" }} />
                 <br />
                 <label for="place">&nbsp; Place (สถานที่)</label>
                 <br />
-                <input defaultValue={img64[2]} type="text" id="place-cat" name="placecat" className="form-control" placeholder="Enter place" style={{ borderColor: "black", borderRadius: "5px" }} />
+                <input defaultValue={img64[2]} type="text" id="edit-cat" name="placecat" className="form-control" placeholder="Enter place" style={{ borderColor: "black", borderRadius: "5px" }} />
                 <br />
                 <label for="preview">&nbsp; Preview image (ภาพตัวอย่าง)</label>
                 <br />
@@ -299,9 +338,6 @@ const Edit = () => {
                 <br />
                 <br />
                 <h6>{img64[3]}</h6>
-                <button className="btn btn-primary btn-block" id="delete-cat" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red" }} onClick={(e) => {
-                  deletefromDB("catalog", img64[4], e)
-                  listAllData("listcatalog");}}>Delete this post</button>
               </>}
               handleClose={closePopup}
             />}
@@ -314,6 +350,7 @@ const Edit = () => {
                   </div>)
               }) : null}
             </div>
+            <div style={{borderTop: "1px solid darkblue", marginBottom: "10px", marginTop: "10px"}}></div>
             <u><h5>To catalog (เพิ่มแคตตาล้อก)</h5></u>
             <label for="name">&nbsp; Name (ชื่อผลงาน)</label>
             <br />
@@ -335,9 +372,28 @@ const Edit = () => {
               accept=".jpg,.png,.jpeg"
               id="image"
               style={{ marginTop: "10px" }}
-              onChange={(e) => selectFiles(e.target.files)}
+              onChange={(e) => {
+                setpreUpload([]);
+                selectFiles(e.target.files);
+                setpreUpload([]);}}
             />
             <label for="image">Upload catalog content (Support .jpeg .jpg .png)</label>
+            <br />
+            <br />
+            {Preview &&
+            <>
+              <u><label for="preview">Preview before upload (ภาพตัวอย่างก่อนทำการอัพโหลด)</label></u>
+              <br />
+              {imglist}
+              <br />
+              <br />
+              <div style={{borderTop: "1px solid darkblue"}}></div>
+              <br />
+              <u><label for="preview">This image will use as preview (ภาพนี้จะถูกใช้เป็นภาพปกแคตตาล้อก)</label></u>
+              <br />
+              <img src={`data:image/jpg;base64,${preUpload[0]}`} id="preview" width="40%" height="40%" style={{marginTop: "10px"}}></img>
+              <br />
+            </>}
             <div className="right-align">
               <button type="submit" className="btn btn-primary btn-block" id="to-catalog" value="Reset" style={{ marginTop: "2vh" }}>Submit</button>
               <button type="reset" className="btn btn-primary btn-block" value="Reset" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red", marginLeft: "10px" }} onClick={() => {
@@ -355,9 +411,15 @@ const Edit = () => {
             {isOpen && <Popup
               content={<>
                 <u><h5>แก้ไขข้อมูล (Edit)</h5></u>
+                <button className="btn btn-primary btn-block" id="delete-model" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red" }} onClick={(e) => {
+                  deletefromDB("model", img64[5], e)
+                  listAllData("listmodel");
+                }}>ลบข้อมูล (Delete)</button>
+                <br />
+                <br />
                 <label for="name">&nbsp; Name (ชื่อโมเดล)</label>
                 <br />
-                <input defaultValue={img64[0]} type="text" id="name-model" name="namemodel" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }}/>
+                <input defaultValue={img64[0]} type="text" id="name-model" name="namemodel" className="form-control" placeholder="Enter name" style={{ borderColor: "black", borderRadius: "5px" }} />
                 <br />
                 <label for="detail">&nbsp; Detail (รายละเอียด)</label>
                 <br />
@@ -376,9 +438,6 @@ const Edit = () => {
                 <br />
                 <br />
                 <h6>{img64[4]}</h6>
-                <button className="btn btn-primary btn-block" id="delete-model" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red" }} onClick={(e) => {
-                  deletefromDB("model", img64[5], e)
-                  listAllData("listmodel");}}>Delete this post</button>
               </>}
               handleClose={closePopup}
             />}
@@ -391,6 +450,7 @@ const Edit = () => {
                   </div>)
               }) : null}
             </div>
+            <div style={{borderTop: "1px solid green", marginBottom: "10px", marginTop: "10px"}}></div>
             <u><h5>To model (เพิ่มโมเดล)</h5></u>
             <label for="name">&nbsp; Name (ชื่อโมเดล)</label>
             <br />
@@ -406,7 +466,7 @@ const Edit = () => {
             <br />
             <label for="dimension">&nbsp; Enter width dimension (ขนาดความกว้างของโมเดล)</label>
             <br />
-            <input required type="number" id="dimension-model" name="dimensionmodel" className="form-control" placeholder="Enter width dimension" style={{ borderColor: "black", borderRadius: "5px" }} />
+            <input required type="number" step=".001" id="dimension-model" name="dimensionmodel" className="form-control" placeholder="Enter width dimension" style={{ borderColor: "black", borderRadius: "5px" }} />
             <input
               required
               class="form-control"
@@ -451,6 +511,13 @@ const Edit = () => {
             <label for="image">Upload preview model (Support .jpeg .jpg .png)</label>
             <br />
             <br />
+            {Preview &&
+            <>
+              <u><label for="preview">This image will use as preview (ภาพนี้จะถูกใช้เป็นภาพตัวอย่างโมเดล)</label></u>
+              <br />
+              <img src={`data:image/jpg;base64,${preUpload[0]}`} id="preview" width="40%" height="40%" style={{marginTop: "10px"}}></img>
+              <br />
+            </>}
             <div className="right-align">
               <button type="submit" className="btn btn-primary btn-block" id="to-model" value="Reset" style={{ marginTop: "2vh" }}>Submit</button>
               <button type="reset" className="btn btn-primary btn-block" value="Reset" style={{ marginTop: "2vh", backgroundColor: "red", borderColor: "red", marginLeft: "10px" }} onClick={() => {

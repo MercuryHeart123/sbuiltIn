@@ -10,7 +10,7 @@ const MongoStore = require("connect-mongo");
 const { MongoClient } = require("mongodb");
 const { v4: uuidv4 } = require("uuid");
 
-const uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}:${process.env.DB_PORT}`;
+const uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_IP}:${process.env.DB_PORT}/sbuiltin`;
 
 let port = process.env.PORT || 8080
 
@@ -96,7 +96,7 @@ app.post("/logout", checkAuth, (req, res) => {
     });
 });
 
-app.post("/deletepost", async (req, res) => {
+app.post("/deletepost", checkAuth, async (req, res) => {
     const { uuid, pathDB } = req.body;
     let data = { uid: uuid };
     console.log(data);
@@ -274,7 +274,7 @@ app.post("/getcatalog", async (req, res) => {
     console.log("Hello from get catalog");
 })
 
-app.post("/editcatalog", async (req, res) => {
+app.post("/editcatalog", checkAuth, async (req, res) => {
     const { namecat, detailcat, placecat, image, uid } = req.body;
     let query = { namecat, detailcat, placecat, image, uid };
     let today = new Date();
@@ -355,7 +355,7 @@ app.post("/editcatalog", async (req, res) => {
     }
 })
 
-app.post("/editmodel", async (req, res) => {
+app.post("/editmodel", checkAuth, async (req, res) => {
     const { namemodel, detailmodel, pricemodel, dimensionmodel, image, imagePreview, imageAddon, uid } = req.body;
     let query = { namemodel, detailmodel, pricemodel, dimensionmodel, image, imagePreview, imageAddon, uid };
     let today = new Date();
@@ -363,7 +363,7 @@ app.post("/editmodel", async (req, res) => {
     var time = today.getHours() + ":" + today.getMinutes();
     var serverDate = `Last modified: ${date}@${time}`;
     let priceNum = parseInt(query.pricemodel);
-    let dimensionNum = parseInt(query.dimensionmodel)
+    let dimensionNum = parseFloat(query.dimensionmodel)
     console.log(dimensionNum);
     console.log(date);
     console.log("Hello from post editmodel");

@@ -21,6 +21,8 @@
     animation: fadein 1s;
 }
 
+#enforce::-webkit-scrollbar { width: 0 !important }
+
 a {
   color: #1890ff;
   text-decoration: none;
